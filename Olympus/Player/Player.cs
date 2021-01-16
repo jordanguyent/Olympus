@@ -9,14 +9,11 @@ public class Player : KinematicBody2D
 	// [Export] int FRICTION = 300;
 	[Export] int JUMPSPEED = -250;
 	[Export] int GRAVITY = 900;
-	// [Export] int JUMPHELDMAX = 7;
+	[Export] int MAXJUMPFRAME = 7;
 	
-	private Vector2 velocity = new Vector2();
-	bool isGrounded = false;
+	private Vector2 velocity = new Vector2(0,0);
 	bool isPressingJump = false;
-	bool isHoldingJump = false;
-	bool stoppedHoldingJump = false;
-	int jumpHeld = 0;
+	int jumpFrame = 0;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -37,10 +34,23 @@ public class Player : KinematicBody2D
 		
 		// IsActionJustPressed used instead of IsActionPressed because truth 
 		// value only changes for one frame, so you cant just hold up to keep
-		// jumping.
+		// jumping. Implemented shorthop-fullhop with if/if else/else statement.
+		// Player can hold a jump for 0-JUMPMAXFRAME frames.
 		if ( Input.IsActionJustPressed("ui_up") && (IsOnFloor() || IsOnWall()) )
 		{
 			velocity.y = JUMPSPEED;
+			jumpFrame++;
+			isPressingJump = true;
+		}
+		else if (isPressingJump && jumpFrame < MAXJUMPFRAME && Input.IsActionPressed("ui_up"))
+		{
+			velocity.y = JUMPSPEED;
+			jumpFrame++;
+		}
+		else
+		{
+			jumpFrame = 0;
+			isPressingJump = false;
 		}
 		
 		// MoveAndSlide takes a velocity vector and an "up direction" vector. 

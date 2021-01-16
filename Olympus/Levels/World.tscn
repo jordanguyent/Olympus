@@ -6,6 +6,8 @@
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 56, 40 )
+JUMPSPEED = -200
+MAXJUMPFRAME = 10
 
 [node name="Ground3" type="KinematicBody2D" parent="."]
 position = Vector2( 8, 24 )
