@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Player/Player.cs" type="Script" id=1]
+[ext_resource path="res://Sprites/Player_SpriteSheet.png" type="Texture" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 5.45364, 7.09004 )
+
+[node name="Player" type="KinematicBody2D"]
+collision_layer = 2147483649
+collision_mask = 2147483649
+script = ExtResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+texture = ExtResource( 2 )
+hframes = 28
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0.678139, 2.91718 )
+shape = SubResource( 1 )

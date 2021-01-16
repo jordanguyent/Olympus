@@ -1,3 +1,18 @@
-[gd_scene format=2]
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Player/Player.tscn" type="PackedScene" id=1]
 
 [node name="World" type="Node2D"]
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 56, 40 )
+
+[node name="Ground3" type="KinematicBody2D" parent="."]
+position = Vector2( 8, 24 )
+collision_mask = 2147483649
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Ground3"]
+polygon = PoolVector2Array( 0, -16, 24, -16, 24, 56, 184, 56, 184, 72, 0, 72 )
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="Ground3"]
+polygon = PoolVector2Array( 184, 152, 184, 136, 224, 136, 224, 104, 240, 104, 240, 72, 256, 72, 256, 152 )
