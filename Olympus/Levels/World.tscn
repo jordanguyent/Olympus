@@ -6,15 +6,22 @@
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 56, 40 )
-JUMPSPEED = -200
-MAXJUMPFRAME = 10
+FALLRATE = 75.0
+WALLJUMPFACTORX = 1.35
+WALLJUMPFACTORY = 1.2
 
 [node name="Ground3" type="KinematicBody2D" parent="."]
 position = Vector2( 8, 24 )
 collision_mask = 2147483649
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Ground3"]
+position = Vector2( -24, 24 )
 polygon = PoolVector2Array( 0, -16, 24, -16, 24, 56, 184, 56, 184, 72, 0, 72 )
 
 [node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="Ground3"]
-polygon = PoolVector2Array( 184, 152, 184, 136, 224, 136, 224, 104, 240, 104, 240, 72, 256, 72, 256, 152 )
+position = Vector2( 64, 16 )
+polygon = PoolVector2Array( 88, 152, 88, 136, 224, 136, 224, 104, 240, 104, 240, -40, 256, -40, 256, 152 )
+
+[node name="CollisionPolygon2D3" type="CollisionPolygon2D" parent="Ground3"]
+position = Vector2( -24, 0 )
+polygon = PoolVector2Array( 208, 128, 208, -32, 272, -32, 272, 128, 264, 128, 264, -24, 216, -24, 216, 128 )
