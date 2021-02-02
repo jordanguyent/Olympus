@@ -25,3 +25,6 @@ polygon = PoolVector2Array( 88, 152, 88, 136, 224, 136, 224, 104, 240, 104, 240,
 [node name="CollisionPolygon2D3" type="CollisionPolygon2D" parent="Ground3"]
 position = Vector2( -24, 0 )
 polygon = PoolVector2Array( 208, 128, 208, -32, 272, -32, 272, 128, 264, 128, 264, -24, 216, -24, 216, 128 )
+
+[node name="CollisionPolygon2D4" type="CollisionPolygon2D" parent="Ground3"]
+polygon = PoolVector2Array( 72, 48, 80, 48, 80, -16, 96, -16, 96, 48, 104, 48, 104, -24, 72, -24 )

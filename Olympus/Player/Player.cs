@@ -12,11 +12,12 @@ using System;
 // 
 // GOALS FOR FUTURE MEETS 
 // ----------------------
-// * add an input buffer
 // * clean things in the code. see todo and warnings
-// * more consistent code, sometimes we count up to a value like with jumpFrame
-//		and other times we count down like with frameLockX/Y. 
+// 
+// * build a sample level
+// * animations (later)
 
+// is there anything that should be commented here?
 public class Player : KinematicBody2D
 {
 	// Movement Constants
@@ -26,6 +27,7 @@ public class Player : KinematicBody2D
 	[Export] int GRAVITY = 900;
 	[Export] int JUMPSPEED = -200;
 	[Export] float FALLRATE = 100;
+	[Export] float FASTFALLFACTOR = 2.0f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.2f;
 	private Vector2 E1 = new Vector2(1, 0);
@@ -34,14 +36,26 @@ public class Player : KinematicBody2D
 	// Frame Data Constants
 	[Export] int MAXJUMPFRAME = 10;
 	[Export] int FRAMELOCKXY = 5;
+	[Export] int INPUTBUFFERMAX = 5;
 	
 	// Player Movement Variables
 	private Vector2 velocity = new Vector2(0,0);
 	private Vector2 userInput = new Vector2(0,0);
-	private int jumpFrame = 0;
+	private Vector2 mouseDirection = new Vector2(0,0);
+	private bool mouseLeftClicked = false;
+	private bool mouseRightClicked = false;
+	private bool mouseMiddleClicked = false;
+	private bool lastOnFloor = false;
+	private bool justPressedJump = false;
+	private bool isFastFalling = false;
+	private int lastCollisionDirectionX = 1;
+	private int lastCollisionDirectionY = 1;
 	private int frameLockX = 0;
 	private int frameLockY = 0;
-	private bool lastOnFloor = false;
+	private int jumpFrames = 0;
+	private int inputBufferFrames = 0;
+	private float fallSpeedFactor = 1.0f;
+	private float fallAccelerationFactor = 1.0f;
 	
 	//  Called when the node enters the scene tree for the first time.
 	//
@@ -65,16 +79,9 @@ public class Player : KinematicBody2D
 	//   
 	public override void _PhysicsProcess(float delta)
 	{
-		// [ TODO ] create an updatePlayerSate() function here that updates 
-		// values like userInput, lastOnFloor, and other booleans that are used
-		// to determine what the player should be doing.
-
-		// Freeze user inputs to be this for the rest of the calculations as it
-		// is possible for these values to change between lines of code and 
-		// result in inconcistencies in code. 
-		userInput.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
-		userInput.y = Input.GetActionStrength("ui_up");
-		bool justPressedJump = Input.IsActionJustPressed("ui_up");
+		// Update player based on user inputs so we may make calculations
+		// about their movement consistently in the following functions.
+		HelperUpdatePlayerState();
 		
 		// Calculation of Player movements
 		HelperUpdateVelocityX(delta);
@@ -84,7 +91,67 @@ public class Player : KinematicBody2D
 		// MoveAndSlide takes a velocity vector and an "up direction" vector to
 		// know in what direction the floor is. This info is necessary for the
 		// function IsOnFloor to work properly.
-		velocity = MoveAndSlide(velocity, new Vector2(0, -1));
+		velocity = MoveAndSlide(velocity, -1 * E2);
+	}
+
+	// Supposed to record the inputs from the user at the start of each fram so
+	// that we can consistently calculate what the player is doing
+	//
+	// Parameters 
+	// ----------
+	//
+	// Returns
+	// -------
+	//
+	private void HelperUpdatePlayerState()
+	{
+		// Freeze user inputs to be this for the rest of the calculations as it
+		// is possible for these values to change between lines of code and 
+		// result in inconcistencies in code. 
+		userInput.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
+		userInput.y = Input.GetActionStrength("ui_up");
+
+		// We separate fallSpeedFactor and fallAccelerationFactor because we
+		// want the player to slow down at the same speed that they speed up to
+		// their fast fall speed.
+		isFastFalling = Input.IsActionPressed("ui_down") && velocity.y > 0;
+		fallSpeedFactor = isFastFalling ? FASTFALLFACTOR : 1.0f;
+		fallAccelerationFactor = (isFastFalling || MAXSPEEDY < velocity.y) ? FASTFALLFACTOR : 1.0f;
+
+		// This code here is for buffering a jump. 
+		if (Input.IsActionJustPressed("ui_up"))
+		{
+			justPressedJump = true;
+			inputBufferFrames = INPUTBUFFERMAX;
+		}
+		if (inputBufferFrames == 0)
+		{
+			justPressedJump = false;
+		}
+		if (justPressedJump)
+		{
+			inputBufferFrames--;
+		}
+
+		// This code here is for updating the last thing that the player 
+		// collided with in both the x and y directions. This information is
+		// important for jumping off walls.
+		for (int i = 0; i < GetSlideCount(); i++)
+		{
+			Vector2 collisionVector = GetSlideCollision(i).Normal;
+			lastCollisionDirectionX = collisionVector.x != 0 ? -Math.Sign(collisionVector.x) : lastCollisionDirectionX;
+			lastCollisionDirectionY = collisionVector.y != 0 ? -Math.Sign(collisionVector.y) : lastCollisionDirectionY;
+		}
+
+		// Records mouse data: Position of mouse relative to player and bool
+		// for left/middle/right click on mouse.
+		mouseDirection = GetLocalMousePosition().Normalized();
+		mouseLeftClicked = Input.IsActionJustPressed("ui_left_click");
+		mouseMiddleClicked = Input.IsActionJustPressed("ui_middle_click");
+		mouseRightClicked = Input.IsActionJustPressed("ui_right_click");
+		if (mouseLeftClicked) {	GD.Print($"LLLLL Mouse :)"); }
+		if (mouseMiddleClicked) { GD.Print($"MMMMM Mouse :)"); }
+		if (mouseRightClicked) { GD.Print($"RRRRR Mouse :)"); }
 	}
 
 	// Calculates and updates velocity.x
@@ -107,7 +174,7 @@ public class Player : KinematicBody2D
 		}
 		// If the frame lock for X is nonzero, decrement it until it is 0 so
 		// that the player may be allowed to move again.
-		else if (frameLockX > 0)
+		else
 		{
 			frameLockX--;
 		}
@@ -124,15 +191,6 @@ public class Player : KinematicBody2D
 	//   
 	private void HelperUpdateVelocityY(float delta)
 	{
-		// [ WARNING ] implementing the frameLockY here makes it so that the 
-		// player always gets a "long-jump" in the air. Consider removing 
-		// frameLockY to allow gravity imediately after jump and increase 
-		// WALLJUMPFACTORY instead for stability in case we need to use 
-		// frameLockY for other reasons.
-		// [ CONSIDER ] currently acceleration to fall rate is just gravity, 
-		// maybe we want it to be something else (a factor of gravity maybe)?
-		// [ CONSIDER ] maybe we want some kind of fast fall like thing?
-
 		// If we currently have a frame lock for Y we ignore the user's input
 		// and just "keep" the current momentum for the player so that he may
 		// not counter his velocity during a wall jump. 
@@ -145,15 +203,18 @@ public class Player : KinematicBody2D
 				velocity.y = HelperMoveToward(velocity.y, FALLRATE, delta * GRAVITY);
 			}
 			// If we are just in the air we want gravity to be applied until 
-			// the player reaches their terminal velocity, MAXSPEEDY.
+			// the player reaches their terminal velocity, MAXSPEEDY. If the
+			// player is fast falling, fall factor is > 1 else 1. the player
+			// will also decelerate to MAXSPEEDY as fast as they accelerate
+			// to their fast fall speed (see HelperUpdatePlayerState)
 			else
 			{
-				velocity.y = HelperMoveToward(velocity.y, MAXSPEEDY, delta * GRAVITY);
+				velocity.y = HelperMoveToward(velocity.y, MAXSPEEDY * fallSpeedFactor, delta * GRAVITY * fallAccelerationFactor);
 			}
 		}
 		// If the frame lock for Y is nonzero, decrement it until it is 0 so
 		// that the player may be allowed to move again.
-		else if (frameLockY > 0)
+		else
 		{
 			frameLockY--;
 		}
@@ -172,78 +233,63 @@ public class Player : KinematicBody2D
 	// 
 	private void HelperUpdateVelocityOnJump(bool justPressedJump)
 	{
-		// [ WARNING ] GetSlideCollision(), count from GetSlideCount() - 1 to 0
-		// and stop at the first instance of a nonzero number. make a while loop
-		// instead of a for loop. in addition, for a better optimization still,
-		// when getting the userInput, update a variable about last collision
-		// that is only updated for nonzero collisions.
+		// [ CONSIDER ] making the || into an && since jumping kinda requires
+		// both directions right? 
 
-		// jumping is only possible if there is an inactive frameLock. (why???)
+		// jumping is only possible if there is an inactive frameLock.
 		if (frameLockX == 0 || frameLockY == 0)
 		{
 			// The start of a jump
 			if (justPressedJump)
 			{
-				// When player is on floor, just adjust velocity.y. jumpFrame
-				// reset to 0 to enable variable height jump. Remember that
-				// the player was last on floor since (???)
+				// When player is on floor, just adjust velocity.y. jumpFrames
+				// set to MAXJUMPFRAME to enable variable height jump. Remember
+				// that the player was last on floor for the vairbale jump.
 				if (IsOnFloor())
 				{
 					velocity.y = JUMPSPEED;
-					jumpFrame = 0;
+					jumpFrames = MAXJUMPFRAME;
 					lastOnFloor = true;
+					inputBufferFrames = 0;
 				}
-				// When player is on wall, get the direction of last collision,
-				// and update velocity vector. Set frame locks so that user
-				// cant go against their wall jump momentum. 
+				// When player is on wall, use direction of last collision to
+				// jump away from wall and update velocity vector. Set frame
+				// lock x so that user cant go against their wall jump momentum.
 				else if (IsOnWall())
 				{
-
-					// getting direction of which player collided
-					int direction = 1;
-					for (int i = 0; i < GetSlideCount(); i++)
-					{
-						var collision = GetSlideCollision(i);
-						if (collision.Normal.x > 0) // left
-						{
-							direction = -1;
-						}
-						else if (collision.Normal.x < 0) // right
-						{
-							direction = 1;
-						}
-					}
-					velocity.x = Math.Sign(direction) * -WALLJUMPFACTORX * MAXSPEEDX;
+					velocity.x = Math.Sign(lastCollisionDirectionX) * -WALLJUMPFACTORX * MAXSPEEDX;
 					velocity.y = JUMPSPEED * WALLJUMPFACTORY;
 					frameLockX = FRAMELOCKXY;
-					frameLockY = FRAMELOCKXY;
-					jumpFrame = MAXJUMPFRAME;
+					jumpFrames = 0;
 					lastOnFloor = false;
+					inputBufferFrames = 0;
 				}
 			}
 			// User is holding down the jump button after starting a jump. This
 			// is to get variable jump heights. 
-			if (userInput.y != 0 && jumpFrame < MAXJUMPFRAME)
+			if (userInput.y != 0 && jumpFrames != 0)
 			{
+				// Implementation of the variable jump height.
+				if (lastOnFloor)
+				{
+					jumpFrames--;
+					velocity.y = JUMPSPEED;
+				}
 				// If hits the ceiling, act like user has hit apex of jump to
 				// not slide through corners. We want this to be the case if
 				// jumping off wall or ground.
 				if (IsOnCeiling())
 				{
-					jumpFrame = MAXJUMPFRAME;
-				}
-				// Implementation of the variable jump height.
-				if (lastOnFloor)
-				{
-					jumpFrame++;
-					velocity.y = JUMPSPEED;
+					jumpFrames = 0;
 				}
 			} 
-			// This is done to ensure user jumpFrame goes back to MAXJUMPFRAME
-			// in the case that they do a short hop.
+			// This is done to ensure user jumpFrame goes back to 0 in the case
+			// that they do a short hop since we dont want them to be able to
+			// jump for first two frames, then stop for another two frames, and
+			// then continue jumping afterwards the remaining jumpFrames.
 			else 
 			{
-				jumpFrame = MAXJUMPFRAME;
+				jumpFrames = 0;
 			}
 		}
 	}
