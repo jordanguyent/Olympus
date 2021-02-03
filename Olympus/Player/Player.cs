@@ -26,8 +26,9 @@ public class Player : KinematicBody2D
 	[Export] int ACCELERATION = 1000;
 	[Export] int GRAVITY = 900;
 	[Export] int JUMPSPEED = -200;
-	[Export] float FALLRATE = 100;
-	[Export] float FASTFALLFACTOR = 2.0f;
+	[Export] float ONWALLFALLSPEED = 100;
+	[Export] float FASTFALLFACTORSPEED = 1.5f;
+	[Export] float FASTFALLFACTORACCELERATE = 2.0f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.2f;
 	private Vector2 E1 = new Vector2(1, 0);
@@ -115,8 +116,8 @@ public class Player : KinematicBody2D
 		// want the player to slow down at the same speed that they speed up to
 		// their fast fall speed.
 		isFastFalling = Input.IsActionPressed("ui_down") && velocity.y > 0;
-		fallSpeedFactor = isFastFalling ? FASTFALLFACTOR : 1.0f;
-		fallAccelerationFactor = (isFastFalling || MAXSPEEDY < velocity.y) ? FASTFALLFACTOR : 1.0f;
+		fallSpeedFactor = isFastFalling ? FASTFALLFACTORSPEED : 1.0f;
+		fallAccelerationFactor = (isFastFalling || MAXSPEEDY < velocity.y) ? FASTFALLFACTORACCELERATE : 1.0f;
 
 		// This code here is for buffering a jump. 
 		if (Input.IsActionJustPressed("ui_up"))
@@ -200,7 +201,7 @@ public class Player : KinematicBody2D
 			// only if he is already falling not when he is on the way up.
 			if (IsOnWall() && velocity.y > 0)
 			{
-				velocity.y = HelperMoveToward(velocity.y, FALLRATE, delta * GRAVITY);
+				velocity.y = HelperMoveToward(velocity.y, ONWALLFALLSPEED, delta * GRAVITY);
 			}
 			// If we are just in the air we want gravity to be applied until 
 			// the player reaches their terminal velocity, MAXSPEEDY. If the
