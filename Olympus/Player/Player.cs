@@ -58,6 +58,11 @@ public class Player : KinematicBody2D
 	private float fallSpeedFactor = 1.0f;
 	private float fallAccelerationFactor = 1.0f;
 	
+	// Animation Variables
+	private AnimatedSprite playerAnimation;
+	// [TODO] Try animationTree and Player since it provides more functionality. 
+	// Try both methods, see what works best
+	
 	//  Called when the node enters the scene tree for the first time.
 	//
 	// Parameters 
@@ -66,7 +71,13 @@ public class Player : KinematicBody2D
 	// Returns
 	// -------
 	//   
-	public override void _Ready() {}
+	public override void _Ready() 
+	{ 
+		// Retrieves the Player's AnimatedSprite node in order to call its 
+		// methods.
+		playerAnimation = GetNode<AnimatedSprite>("AnimatedSprite");
+		playerAnimation.Play("Idle");
+	}
 
 	// Obtains information about user input and uses information to calculate
 	// and update velocty as well as move the player in-game.
@@ -93,6 +104,9 @@ public class Player : KinematicBody2D
 		// know in what direction the floor is. This info is necessary for the
 		// function IsOnFloor to work properly.
 		velocity = MoveAndSlide(velocity, -1 * E2);
+
+		// Plays correct animation
+		PlayAnimation();
 	}
 
 	// Supposed to record the inputs from the user at the start of each fram so
@@ -300,6 +314,37 @@ public class Player : KinematicBody2D
 	private float HelperMoveToward(float current, float desire, float acceleration)
 	{
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
+	}
+	
+	// Plays the correct animation
+	private void PlayAnimation()
+	{
+		// determines where player faces
+		if (velocity.x < 0)
+			playerAnimation.FlipH = true;
+		else if (velocity.x > 0)
+			playerAnimation.FlipH = false;
+
+		// Running
+		if (IsOnFloor())
+		{
+			if (velocity.x != 0)
+				playerAnimation.Play("Run");
+			else
+				playerAnimation.Play("Idle");
+		} 
+		// Jump
+		else 
+		{	
+			if (velocity.y < 0)
+				playerAnimation.Play("Jump0");
+			else if (velocity.y > 0)
+				if (IsOnWall())
+					playerAnimation.Play("Climb");
+				else
+					playerAnimation.Play("Jump2");
+				
+		}
 	}
 }
 
