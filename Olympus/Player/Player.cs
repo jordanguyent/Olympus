@@ -12,6 +12,13 @@ using System;
 // 
 // GOALS FOR FUTURE MEETS 
 // ----------------------
+// * why does the ball follow the player and is not independent anymore?
+// * make it so that the ball does not collide with the player when player is
+//		throwing the ball. Basically, the ball should only begin to bounce off
+//		the player after it has collided with one other thing.
+// * make it so that the player takes some of the momentum and bounces off of
+// 		the ball. (user more signals)
+// * 
 // * clean things in the code. see todo and warnings
 // 
 // * build a sample level
@@ -27,10 +34,10 @@ public class Player : KinematicBody2D
 	[Export] int GRAVITY = 900;
 	[Export] int JUMPSPEED = -200;
 	[Export] float ONWALLFALLSPEED = 100;
-	[Export] float FASTFALLFACTORSPEED = 1.5f;
-	[Export] float FASTFALLFACTORACCELERATE = 2.0f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.2f;
+	[Export] int DEFAULTDASHCOUNT = 1;
+	[Export] int DASHSPEED = 300;
 	private Vector2 E1 = new Vector2(1, 0);
 	private Vector2 E2 = new Vector2(0, 1);
 
@@ -38,27 +45,28 @@ public class Player : KinematicBody2D
 	[Export] int MAXJUMPFRAME = 10;
 	[Export] int FRAMELOCKXY = 5;
 	[Export] int INPUTBUFFERMAX = 5;
+	[Export] int DASHFRAMELOCKXY = 10;
+
+	// Object Constants
 	
 	// Player Movement Variables
 	private Vector2 velocity = new Vector2(0,0);
 	private Vector2 userInput = new Vector2(0,0);
-	private Vector2 mouseDirection = new Vector2(0,0);
-	private bool mouseLeftClicked = false;
-	private bool mouseRightClicked = false;
-	private bool mouseMiddleClicked = false;
 	private bool lastOnFloor = false;
 	private bool justPressedJump = false;
 	private bool isFastFalling = false;
+	private bool isDashing = false;
 	private int lastCollisionDirectionX = 1;
 	private int lastCollisionDirectionY = 1;
+	private int lastFacingDirection = 1;
 	private int frameLockX = 0;
 	private int frameLockY = 0;
 	private int jumpFrames = 0;
 	private int inputBufferFrames = 0;
-	private float fallSpeedFactor = 1.0f;
-	private float fallAccelerationFactor = 1.0f;
+	private int dashCount = 0;
 	
-	//  Called when the node enters the scene tree for the first time.
+	// Called when the node enters the scene tree for the first time. Used to
+	// connect signals from Player to its child nodes like Ball.
 	//
 	// Parameters 
 	// ----------
@@ -91,7 +99,8 @@ public class Player : KinematicBody2D
 		
 		// MoveAndSlide takes a velocity vector and an "up direction" vector to
 		// know in what direction the floor is. This info is necessary for the
-		// function IsOnFloor to work properly.
+		// function IsOnFloor to work properly. Move and slide already takes
+		// delta into account. 
 		velocity = MoveAndSlide(velocity, -1 * E2);
 	}
 
@@ -112,12 +121,41 @@ public class Player : KinematicBody2D
 		userInput.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
 		userInput.y = Input.GetActionStrength("ui_up");
 
-		// We separate fallSpeedFactor and fallAccelerationFactor because we
-		// want the player to slow down at the same speed that they speed up to
-		// their fast fall speed.
-		isFastFalling = Input.IsActionPressed("ui_down") && velocity.y > 0;
-		fallSpeedFactor = isFastFalling ? FASTFALLFACTORSPEED : 1.0f;
-		fallAccelerationFactor = (isFastFalling || MAXSPEEDY < velocity.y) ? FASTFALLFACTORACCELERATE : 1.0f;
+		// Update last facing direction accordingly
+		lastFacingDirection = (userInput.x == 0) ? lastFacingDirection : Math.Sign(userInput.x);
+
+		// Dashing is implemented here.
+		// [ CONSIDER ] Should player be able to dash IMMEDIATELY (next frame) after a wall jump?
+		// currently, right after a wall jump, we set frameLocks for XY so we can't do it, BUT if
+		// we wanted to, we can have a dashLock variable and check for it here instead. 
+		if (frameLockX == 0)
+		{
+			// Dash condition: just pressed dash button (not held) and we have
+			// another dash avaliable. We only check this when frameLockX is
+			// frameLockX should prevent any horizontal movement changes. We
+			// also set frameLockY and 0 velocity.y so that the player can
+			// "float" while dashing.
+			GD.Print("DASHING");
+			if (Input.IsActionJustPressed("ui_dash") && dashCount > 0)
+			{
+				GD.Print("DASHING");
+				isDashing = true;
+				dashCount--;
+				frameLockX = DASHFRAMELOCKXY;
+				frameLockY = DASHFRAMELOCKXY;
+				velocity.x = DASHSPEED * lastFacingDirection;
+				velocity.y = 0;
+			}
+			else
+			{
+				isDashing = false;
+			}
+			// Dashes reset only when on the ground and player is not dashing.
+			if (IsOnFloor() && !isDashing)
+			{
+				dashCount = DEFAULTDASHCOUNT;
+			}
+		}
 
 		// This code here is for buffering a jump. 
 		if (Input.IsActionJustPressed("ui_up"))
@@ -143,16 +181,6 @@ public class Player : KinematicBody2D
 			lastCollisionDirectionX = collisionVector.x != 0 ? -Math.Sign(collisionVector.x) : lastCollisionDirectionX;
 			lastCollisionDirectionY = collisionVector.y != 0 ? -Math.Sign(collisionVector.y) : lastCollisionDirectionY;
 		}
-
-		// Records mouse data: Position of mouse relative to player and bool
-		// for left/middle/right click on mouse.
-		mouseDirection = GetLocalMousePosition().Normalized();
-		mouseLeftClicked = Input.IsActionJustPressed("ui_left_click");
-		mouseMiddleClicked = Input.IsActionJustPressed("ui_middle_click");
-		mouseRightClicked = Input.IsActionJustPressed("ui_right_click");
-		if (mouseLeftClicked) {	GD.Print($"LLLLL Mouse :)"); }
-		if (mouseMiddleClicked) { GD.Print($"MMMMM Mouse :)"); }
-		if (mouseRightClicked) { GD.Print($"RRRRR Mouse :)"); }
 	}
 
 	// Calculates and updates velocity.x
@@ -210,7 +238,7 @@ public class Player : KinematicBody2D
 			// to their fast fall speed (see HelperUpdatePlayerState)
 			else
 			{
-				velocity.y = HelperMoveToward(velocity.y, MAXSPEEDY * fallSpeedFactor, delta * GRAVITY * fallAccelerationFactor);
+				velocity.y = HelperMoveToward(velocity.y, MAXSPEEDY, delta * GRAVITY);
 			}
 		}
 		// If the frame lock for Y is nonzero, decrement it until it is 0 so
@@ -255,7 +283,8 @@ public class Player : KinematicBody2D
 				}
 				// When player is on wall, use direction of last collision to
 				// jump away from wall and update velocity vector. Set frame
-				// lock x so that user cant go against their wall jump momentum.
+				// lock x so that user cant go against own wall jump momentum.
+				// Also, lastCollisionDirectionX is a nonzero value.
 				else if (IsOnWall())
 				{
 					velocity.x = Math.Sign(lastCollisionDirectionX) * -WALLJUMPFACTORX * MAXSPEEDX;
