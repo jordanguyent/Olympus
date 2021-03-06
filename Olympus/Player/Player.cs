@@ -27,7 +27,7 @@ using System;
 // is there anything that should be commented here?
 public class Player : KinematicBody2D
 {
-	// Movement Constants
+	// Wolrd Movement Constants
 	[Export] int MAXSPEEDX = 100;
 	[Export] int MAXSPEEDY = 300;
 	[Export] int ACCELERATION = 1000;
@@ -45,7 +45,7 @@ public class Player : KinematicBody2D
 	[Export] int MAXJUMPFRAME = 10;
 	[Export] int FRAMELOCKXY = 5;
 	[Export] int INPUTBUFFERMAX = 5;
-	[Export] int DASHFRAMELOCKXY = 10;
+	[Export] int DASHFRAMELOCK = 10;
 
 	// Object Constants
 	
@@ -61,6 +61,7 @@ public class Player : KinematicBody2D
 	private int lastFacingDirection = 1;
 	private int frameLockX = 0;
 	private int frameLockY = 0;
+	private int dashLock = 0;
 	private int jumpFrames = 0;
 	private int inputBufferFrames = 0;
 	private int dashCount = 0;
@@ -138,28 +139,25 @@ public class Player : KinematicBody2D
 
 		// Update last facing direction accordingly
 		lastFacingDirection = (userInput.x == 0) ? lastFacingDirection : Math.Sign(userInput.x);
-
+		
 		// Dashing is implemented here.
-		// [ CONSIDER ] Should player be able to dash IMMEDIATELY (next frame) after a wall jump?
-		// currently, right after a wall jump, we set frameLocks for XY so we can't do it, BUT if
-		// we wanted to, we can have a dashLock variable and check for it here instead. 
-		if (frameLockX == 0)
+		if (dashLock == 0)
 		{
 			// Dash condition: just pressed dash button (not held) and we have
 			// another dash avaliable. We only check this when frameLockX is
 			// frameLockX should prevent any horizontal movement changes. We
 			// also set frameLockY and 0 velocity.y so that the player can
 			// "float" while dashing.
-			GD.Print("DASHING");
 			if (Input.IsActionJustPressed("ui_dash") && dashCount > 0)
 			{
-				GD.Print("DASHING");
 				isDashing = true;
 				dashCount--;
-				frameLockX = DASHFRAMELOCKXY;
-				frameLockY = DASHFRAMELOCKXY;
+				frameLockX = DASHFRAMELOCK;
+				frameLockY = DASHFRAMELOCK;
+				dashLock   = DASHFRAMELOCK;
 				velocity.x = DASHSPEED * lastFacingDirection;
 				velocity.y = 0;
+				jumpFrames = 0;
 			}
 			else
 			{
@@ -170,6 +168,10 @@ public class Player : KinematicBody2D
 			{
 				dashCount = DEFAULTDASHCOUNT;
 			}
+		}
+		else
+		{
+			dashLock--;
 		}
 
 		// This code here is for buffering a jump. 
@@ -182,7 +184,7 @@ public class Player : KinematicBody2D
 		{
 			justPressedJump = false;
 		}
-		if (justPressedJump)
+		else
 		{
 			inputBufferFrames--;
 		}
