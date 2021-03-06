@@ -6,8 +6,6 @@
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 56, 40 )
-DEFAULTDASHCOUNT = 2
-DASHSPEED = 500
 
 [node name="Ground3" type="StaticBody2D" parent="."]
 position = Vector2( 8, 24 )
