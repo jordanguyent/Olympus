@@ -46,6 +46,7 @@ public class Player : KinematicBody2D
 	[Export] int FRAMELOCKXY = 5;
 	[Export] int INPUTBUFFERMAX = 5;
 	[Export] int DASHFRAMELOCK = 10;
+	[Export] int WALLBUFFERMAX = 5;
 
 	// Object Constants
 	
@@ -56,6 +57,7 @@ public class Player : KinematicBody2D
 	private bool justPressedJump = false;
 	private bool isFastFalling = false;
 	private bool isDashing = false;
+	private bool wasOnWall = false;
 	private int lastCollisionDirectionX = 1;
 	private int lastCollisionDirectionY = 1;
 	private int lastFacingDirection = 1;
@@ -63,7 +65,8 @@ public class Player : KinematicBody2D
 	private int frameLockY = 0;
 	private int dashLock = 0;
 	private int jumpFrames = 0;
-	private int inputBufferFrames = 0;
+	private int jumpBufferFrames = 0;
+	private int wallBufferFrames = 0;
 	private int dashCount = 0;
 	
 	// Animation Variables
@@ -177,16 +180,16 @@ public class Player : KinematicBody2D
 		// This code here is for buffering a jump. 
 		if (Input.IsActionJustPressed("ui_up"))
 		{
+			jumpBufferFrames = INPUTBUFFERMAX;
 			justPressedJump = true;
-			inputBufferFrames = INPUTBUFFERMAX;
 		}
-		if (inputBufferFrames == 0)
+		else if (jumpBufferFrames > 0)
 		{
-			justPressedJump = false;
+			jumpBufferFrames--;
 		}
 		else
 		{
-			inputBufferFrames--;
+			justPressedJump = false;
 		}
 
 		// This code here is for updating the last thing that the player 
@@ -197,6 +200,23 @@ public class Player : KinematicBody2D
 			Vector2 collisionVector = GetSlideCollision(i).Normal;
 			lastCollisionDirectionX = collisionVector.x != 0 ? -Math.Sign(collisionVector.x) : lastCollisionDirectionX;
 			lastCollisionDirectionY = collisionVector.y != 0 ? -Math.Sign(collisionVector.y) : lastCollisionDirectionY;
+		}
+
+		// count down the buffered wall frames. This is here so that the player
+		// may wall jump a few frames after letting go of the wall. Added to be
+		// more user friendly.
+		if (IsOnWall())
+		{
+			wallBufferFrames = WALLBUFFERMAX;
+			wasOnWall = true;
+		}
+		else if (wallBufferFrames > 0)
+		{
+			wallBufferFrames = WALLBUFFERMAX;
+		}
+		else
+		{
+			wasOnWall = false;;
 		}
 	}
 
@@ -296,20 +316,20 @@ public class Player : KinematicBody2D
 					velocity.y = JUMPSPEED;
 					jumpFrames = MAXJUMPFRAME;
 					lastOnFloor = true;
-					inputBufferFrames = 0;
+					jumpBufferFrames = 0;
 				}
 				// When player is on wall, use direction of last collision to
 				// jump away from wall and update velocity vector. Set frame
 				// lock x so that user cant go against own wall jump momentum.
 				// Also, lastCollisionDirectionX is a nonzero value.
-				else if (IsOnWall())
+				else if (wallBufferFrames > 0)
 				{
 					velocity.x = Math.Sign(lastCollisionDirectionX) * -WALLJUMPFACTORX * MAXSPEEDX;
 					velocity.y = JUMPSPEED * WALLJUMPFACTORY;
 					frameLockX = FRAMELOCKXY;
 					jumpFrames = 0;
 					lastOnFloor = false;
-					inputBufferFrames = 0;
+					jumpBufferFrames = 0;
 				}
 			}
 			// User is holding down the jump button after starting a jump. This
@@ -343,6 +363,17 @@ public class Player : KinematicBody2D
 	
 	// Helper function to do "linear introperlation" without having to caluclate
 	// it automatically and just make it depend on a known working function.
+	// 
+	// Parameters 
+	// ----------
+	// current : current value
+	// desire  : desired value
+	// acceleration : step to move by
+	// 
+	// Returns
+	// -------
+	// linearly interpolated value
+	// 
 	private float HelperMoveToward(float current, float desire, float acceleration)
 	{
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
