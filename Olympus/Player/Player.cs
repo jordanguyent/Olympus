@@ -375,6 +375,12 @@ public class Player : KinematicBody2D
 					playerAnimation.Play("Jump2");
 				
 		}
+		
+		// Dash
+		if (isDashing)
+		{
+			playerAnimation.Play("Dash");
+		}
 	}
 }
 
