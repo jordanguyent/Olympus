@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/TileSet1.png-252a05c4dadd0389e1ab2faebe477671.stex"
+path="res://.import/spikes2.png-5d6bd7c3784e5ac5234c0d045c8ab732.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/TileSet1.png"
-dest_files=[ "res://.import/TileSet1.png-252a05c4dadd0389e1ab2faebe477671.stex" ]
+source_file="res://Sprites/Level1/spikes2.png"
+dest_files=[ "res://.import/spikes2.png-5d6bd7c3784e5ac5234c0d045c8ab732.stex" ]
 
 [params]
 
