@@ -212,7 +212,7 @@ public class Player : KinematicBody2D
 		}
 		else if (wallBufferFrames > 0)
 		{
-			wallBufferFrames = WALLBUFFERMAX;
+			wallBufferFrames--;
 		}
 		else
 		{
