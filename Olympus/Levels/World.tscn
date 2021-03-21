@@ -1,4 +1,4 @@
-[gd_scene load_steps=282 format=2]
+[gd_scene load_steps=284 format=2]
 
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Sprites/Level1/Zeus1.png" type="Texture" id=2]
@@ -10,6 +10,7 @@
 [ext_resource path="res://Sprites/Level1/ClimableGrassSpriteSheet.png" type="Texture" id=8]
 [ext_resource path="res://Sprites/Level1/LeafWallTileSet.png" type="Texture" id=9]
 [ext_resource path="res://Sprites/Level1/StoneWallTileSet.png" type="Texture" id=10]
+[ext_resource path="res://Boxes/Climbable.tscn" type="PackedScene" id=11]
 
 [sub_resource type="TileSet" id=1]
 0/name = "LeafWallTileSet.png 0"
@@ -2602,6 +2603,9 @@ points = PoolVector2Array( 6, 6, 0, 6, 0, 0, 6, 0 )
 1/shapes = [  ]
 1/z_index = 0
 
+[sub_resource type="RectangleShape2D" id=272]
+extents = Vector2( 4.55057, 19.8511 )
+
 [node name="World" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
@@ -2640,3 +2644,14 @@ tile_data = PoolIntArray( 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground"]
 position = Vector2( 144, 48 )
 texture = ExtResource( 3 )
+
+[node name="Climbable" parent="." instance=ExtResource( 11 )]
+collision_layer = 1
+
+[node name="CollisionShape2D" parent="Climbable" index="0"]
+position = Vector2( 253.587, 115.88 )
+shape = SubResource( 272 )
+[connection signal="area_entered" from="Climbable" to="Player" method="OnClimbableAreaEntered"]
+[connection signal="area_exited" from="Climbable" to="Player" method="OnClimbableAreaExited"]
+
+[editable path="Climbable"]

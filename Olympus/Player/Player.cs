@@ -334,7 +334,6 @@ public class Player : KinematicBody2D
 			else if (!isClimbing && IsOnWall() && velocity.y > 0)
 			{
 				wallFrictionFactor = (velocity.y > ONWALLFALLSPEED) ? 1.5f : WALLFRICTIONFACTOR;
-				GD.Print(wallFrictionFactor);
 				velocity.y = HelperMoveToward(velocity.y, ONWALLFALLSPEED, delta * GRAVITY * wallFrictionFactor);
 			}
 			// If we are just in the air we want gravity to be applied until 
@@ -484,7 +483,23 @@ public class Player : KinematicBody2D
 			playerAnimation.Play("Dash");
 		}
 	}
+	
+	// Signals
+	private void OnClimbableAreaEntered(object area)
+	{
+		isClimbing = true;
+	}
+	
+	private void OnClimbableAreaExited(object area)
+	{
+		isClimbing = false;
+	}
 }
+
+
+
+
+
 
 
 
