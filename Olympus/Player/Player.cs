@@ -34,6 +34,8 @@ public class Player : KinematicBody2D
 	[Export] int GRAVITY = 900;
 	[Export] int JUMPSPEED = -200;
 	[Export] int ONWALLFALLSPEED = 100;
+	[Export] int MAXCLIMBSPEED = 100; // stub
+	[Export] int CLIMBACCELERATION = 500; // stub
 	[Export] float WALLFRICTIONFACTOR = .01f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.2f;
@@ -62,6 +64,7 @@ public class Player : KinematicBody2D
 	private bool wasOnWall = false;
 	private bool isClimbing = false;
 	private float wallFrictionFactor = 1;
+	private float jumpStrength = 0;
 	private int lastCollisionDirectionX = 1;
 	private int lastCollisionDirectionY = 1;
 	private int lastFacingDirection = 1;
@@ -145,7 +148,8 @@ public class Player : KinematicBody2D
 		// is possible for these values to change between lines of code and 
 		// result in inconcistencies in code. 
 		userInput.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
-		userInput.y = Input.GetActionStrength("ui_jump");
+		userInput.y = Input.GetActionStrength("ui_up") - Input.GetActionStrength("ui_down");
+		jumpStrength = Input.GetActionStrength("ui_jump");
 
 		// Update last facing direction accordingly
 		lastFacingDirection = (userInput.x == 0) ? lastFacingDirection : Math.Sign(userInput.x);
@@ -324,16 +328,32 @@ public class Player : KinematicBody2D
 		// not counter his velocity during a wall jump. 
 		if (frameLockY == 0)
 		{
-			// implement wall climbing control
-			if (isClimbing && IsOnWall())
+			// Calculate the wall friction factor so that we may have smooth
+			// player movement when falling/sliding/moving on walls.
+			wallFrictionFactor = (velocity.y > ONWALLFALLSPEED) ? 1.5f : WALLFRICTIONFACTOR;
+
+			// Implementation of climbing controls. Make sure that the player
+			// is in a climbing state, is on the wall, and pushing against the
+			// wall to be considered climbing.
+			if (isClimbing && IsOnWall() && userInput.x == lastCollisionDirectionX)
 			{
-				GD.Print("wallclimbing here");
+				// Player is pressed up against the wall and holding up/down
+				// begin accelerating in that direction. We apply an extra -
+				// sign so that the up direction is negative as it should be.
+				if (userInput.y != 0)
+				{
+					velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * ONWALLFALLSPEED, delta * CLIMBACCELERATION);
+				}
+				// if the player is ONLY pressed up against the wall dont fall.
+				else if (userInput.y == 0)
+				{
+					velocity.y = 0;
+				}
 			}
 			// We want a "friction" like thing when player is on a wall, but 
 			// only if he is already falling not when he is on the way up.
-			else if (!isClimbing && IsOnWall() && velocity.y > 0)
+			else if (IsOnWall() && velocity.y > 0)
 			{
-				wallFrictionFactor = (velocity.y > ONWALLFALLSPEED) ? 1.5f : WALLFRICTIONFACTOR;
 				velocity.y = HelperMoveToward(velocity.y, ONWALLFALLSPEED, delta * GRAVITY * wallFrictionFactor);
 			}
 			// If we are just in the air we want gravity to be applied until 
@@ -389,7 +409,9 @@ public class Player : KinematicBody2D
 				// When player is on wall, use direction of last collision to
 				// jump away from wall and update velocity vector. Set frame
 				// lock x so that user cant go against own wall jump momentum.
-				// Also, lastCollisionDirectionX is a nonzero value.
+				// Also, lastCollisionDirectionX is a nonzero value. If on a
+				// climbable surface we dont change anything manually since
+				// exiting the area will result in isClimbing to be updated.
 				else if (wallBufferFrames > 0)
 				{
 					velocity.x = Math.Sign(lastCollisionDirectionX) * -WALLJUMPFACTORX * MAXSPEEDX;
@@ -402,7 +424,7 @@ public class Player : KinematicBody2D
 			}
 			// User is holding down the jump button after starting a jump. This
 			// is to get variable jump heights. 
-			if (userInput.y != 0 && jumpFrames != 0)
+			if (jumpStrength != 0 && jumpFrames != 0)
 			{
 				// Implementation of the variable jump height.
 				if (lastOnFloor)
