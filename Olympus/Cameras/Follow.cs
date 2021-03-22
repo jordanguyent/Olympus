@@ -4,7 +4,7 @@ using System;
 public class Follow : Camera2D
 {
 	// Camera Constants
-	private float STANDARDSCALE = 1.5f;
+	private float STANDARDSCALE = 1.0f;
 	private int STANDARDLIMIT = 10000000;
 	// limits here for boundaries
 	
@@ -15,6 +15,7 @@ public class Follow : Camera2D
 	public override void _Ready()
 	{
 		UpdateZoom(STANDARDSCALE, STANDARDSCALE);
+		NoFollow();
 		MakeCurrent();
 	}
 	

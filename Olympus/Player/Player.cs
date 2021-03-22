@@ -121,6 +121,11 @@ public class Player : KinematicBody2D
 
 		// Plays correct animation
 		PlayAnimation();
+		
+		// snaps pixels to nearest pixel to remove pixel jitter
+		// another solution is snapping camera to nearest pixel
+		// problem with pixels stretching is because we scaled player. 
+		Position = new Vector2((float)Math.Round(Position.x), (float)Math.Round(Position.y));
 	}
 
 	// Supposed to record the inputs from the user at the start of each fram so
