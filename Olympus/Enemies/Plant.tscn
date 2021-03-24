@@ -1,0 +1,53 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Sprites/Level1/PlantSpriteSheet.png" type="Texture" id=1]
+[ext_resource path="res://Boxes/Hurtbox.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Boxes/Hitbox.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Enemies/Plant.cs" type="Script" id=4]
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 6.10983, 7.89397 )
+
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 8, 12 )
+
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 8, 12 )
+
+[node name="Plant" type="StaticBody2D"]
+collision_layer = 16
+collision_mask = 3
+script = ExtResource( 4 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( -0.176777, 2.65165 )
+shape = SubResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Plant" type="Sprite" parent="."]
+texture = ExtResource( 1 )
+hframes = 3
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Hurtbox(Body)" parent="." instance=ExtResource( 2 )]
+collision_layer = 8
+
+[node name="CollisionShape2D" parent="Hurtbox(Body)" index="0"]
+position = Vector2( 7.62939e-06, 2.64865 )
+shape = SubResource( 5 )
+
+[node name="Hitbox(Attack)" parent="." instance=ExtResource( 3 )]
+collision_mask = 4
+
+[node name="CollisionShape2D" parent="Hitbox(Attack)" index="0"]
+position = Vector2( 0, 2.64865 )
+shape = SubResource( 6 )
+[connection signal="area_entered" from="Hurtbox(Body)" to="." method="OnHurtboxBodyAreaEntered"]
+
+[editable path="Hurtbox(Body)"]
+
+[editable path="Hitbox(Attack)"]

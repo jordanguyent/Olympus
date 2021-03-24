@@ -39,7 +39,10 @@ public class Player : KinematicBody2D
 	[Export] int ACCELERATION = 1000;
 	[Export] int GRAVITY = 900;
 	[Export] int JUMPSPEED = -200;
-	[Export] float ONWALLFALLSPEED = 100;
+	[Export] int ONWALLFALLSPEED = 100;
+	[Export] int MAXCLIMBSPEED = 100;
+	[Export] int CLIMBACCELERATION = 500;
+	[Export] float WALLFRICTIONFACTOR = .01f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.2f;
 	[Export] int DEFAULTDASHCOUNT = 1;
@@ -52,6 +55,7 @@ public class Player : KinematicBody2D
 	[Export] int FRAMELOCKXY = 5;
 	[Export] int INPUTBUFFERMAX = 5;
 	[Export] int DASHFRAMELOCK = 10;
+	[Export] int ATTACKFRAMELOCK = 10;
 	[Export] int WALLBUFFERMAX = 5;
 
 	// Object Constants
@@ -66,19 +70,25 @@ public class Player : KinematicBody2D
 	private bool isFastFalling = false;
 	private bool isDashing = false;
 	private bool wasOnWall = false;
+	private bool isClimbing = false;
+	private float wallFrictionFactor = 1;
+	private float jumpStrength = 0;
 	private int lastCollisionDirectionX = 1;
 	private int lastCollisionDirectionY = 1;
 	private int lastFacingDirection = 1;
 	private int frameLockX = 0;
 	private int frameLockY = 0;
 	private int dashLock = 0;
+	private int attackLock = 0;
 	private int jumpFrames = 0;
 	private int jumpBufferFrames = 0;
 	private int wallBufferFrames = 0;
 	private int dashCount = 0;
+	private int attackDirection = 3;
 	
 	// Animation Variables
 	private AnimatedSprite playerAnimation;
+
 	// [TODO] Try animationTree and Player since it provides more functionality. 
 	// Try both methods, see what works best
 	
@@ -163,9 +173,11 @@ public class Player : KinematicBody2D
 		// Plays correct animation
 		PlayAnimation();
 		
+		// Makes every new position a while number in the form of a float. This
+		// is to stop the screen from jittering and shaking randomly. 
 		// snaps pixels to nearest pixel to remove pixel jitter
 		// another solution is snapping camera to nearest pixel
-		// problem with pixels stretching is because we scaled player. 
+		// problem with pixels stretching is because we scaled player.
 		Position = new Vector2((float)Math.Round(Position.x), (float)Math.Round(Position.y));
 	}
 
@@ -184,7 +196,8 @@ public class Player : KinematicBody2D
 		// is possible for these values to change between lines of code and 
 		// result in inconcistencies in code. 
 		userInput.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
-		userInput.y = Input.GetActionStrength("ui_up");
+		userInput.y = Input.GetActionStrength("ui_up") - Input.GetActionStrength("ui_down");
+		jumpStrength = Input.GetActionStrength("ui_jump");
 
 		// Update last facing direction accordingly
 		lastFacingDirection = (userInput.x == 0) ? lastFacingDirection : Math.Sign(userInput.x);
@@ -224,7 +237,7 @@ public class Player : KinematicBody2D
 		}
 
 		// This code here is for buffering a jump. 
-		if (Input.IsActionJustPressed("ui_up"))
+		if (Input.IsActionJustPressed("ui_jump"))
 		{
 			jumpBufferFrames = INPUTBUFFERMAX;
 			justPressedJump = true;
@@ -262,7 +275,62 @@ public class Player : KinematicBody2D
 		}
 		else
 		{
-			wasOnWall = false;;
+			wasOnWall = false;
+		}
+
+		// What we want for attack:
+		// + cant attack if just attacked less than ATTACKFRAMELOCK frames ago
+		// + when attacking, must remember to add this attack frame lock
+		// + cannot attack when on the wall
+		// + can dash into an attack : YES
+		// + can attack into a dash : YES
+		// + can attack into a walljump/regular jump : YES
+		// + walljump/jump into an attack : YES
+		// + will have to change jump button to "space bar" to enable up attack without jumping. (result in minor changes
+		// to HelperUpdatePlayerState)
+		// + when the player is standing still and attacking, will attack in direction that they are facing
+		// + when the player is in the air and attacks while holding up, attack should be facing up. Same if holding down in air,
+		// so left and right have least priority in the air (should probably add a ui_attackLeft, ui_attackRight, ui_attackUp, ui_attackDown
+		// for support for game controllers, kinda like the c-stick in smash)
+		// - have knockback on the player if attack colides with something (preserve momentum but change direction)
+		// ====
+		// - will have to work on hitbox stuff to implement knockback (last step)
+
+		// Getting the direction of the attack by taking the difference of the
+		// up and down keys strength. If they are both held, or neither is held
+		// we resord to lastFacingDirection since up and down direction should 
+		// have priority for in-air attacks. since value of lastFacingDirection
+		// and attackDireciton are both -1/1 we add 1 to lastFacingDirection
+		// and to the final result to get values 0, 1, 2, 3 -> down, left, up, 
+		// right.
+		attackDirection = (int)Input.GetActionStrength("ui_up") - (int)Input.GetActionStrength("ui_down");
+		attackDirection = (attackDirection == 0) ? (lastFacingDirection + 1) : attackDirection;
+		attackDirection++;
+		if (Input.IsActionJustPressed("ui_attack") && attackLock == 0 && !IsOnWall())
+		{
+			attackLock = ATTACKFRAMELOCK;
+			switch (attackDirection)
+			{
+				case 0:
+					GD.Print("down");
+					break;
+				case 1:
+					GD.Print("left");
+					break;
+				case 2:
+					GD.Print("up");
+					break;
+				case 3:
+					GD.Print("right");
+					break;
+				default:
+					GD.Print("Number theory stopped working");
+					break;
+			}
+		}
+		else if (attackLock > 0)
+		{
+			attackLock--;
 		}
 	}
 
@@ -308,11 +376,36 @@ public class Player : KinematicBody2D
 		// not counter his velocity during a wall jump. 
 		if (frameLockY == 0)
 		{
+			// Calculate the wall friction factor so that we may have smooth
+			// player movement when falling/sliding/moving on walls. Since 
+			// WALLFRICTIONFACTOR is so small, the player is allowed to stay
+			// on a wall for a while before begining to slide down. This is an
+			// accidental feature, but a good one to have :)
+			wallFrictionFactor = (velocity.y > ONWALLFALLSPEED) ? 1.5f : WALLFRICTIONFACTOR;
+
+			// Implementation of climbing controls. Make sure that the player
+			// is in a climbing state, is on the wall, and pushing against the
+			// wall to be considered climbing.
+			if (isClimbing && IsOnWall() && userInput.x == lastCollisionDirectionX)
+			{
+				// Player is pressed up against the wall and holding up/down
+				// begin accelerating in that direction. We apply an extra -
+				// sign so that the up direction is negative as it should be.
+				if (userInput.y != 0)
+				{
+					velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * ONWALLFALLSPEED, delta * CLIMBACCELERATION);
+				}
+				// if the player is ONLY pressed up against the wall dont fall.
+				else if (userInput.y == 0)
+				{
+					velocity.y = 0;
+				}
+			}
 			// We want a "friction" like thing when player is on a wall, but 
 			// only if he is already falling not when he is on the way up.
-			if (IsOnWall() && velocity.y > 0)
+			else if (IsOnWall() && velocity.y > 0)
 			{
-				velocity.y = HelperMoveToward(velocity.y, ONWALLFALLSPEED, delta * GRAVITY);
+				velocity.y = HelperMoveToward(velocity.y, ONWALLFALLSPEED, delta * GRAVITY * wallFrictionFactor);
 			}
 			// If we are just in the air we want gravity to be applied until 
 			// the player reaches their terminal velocity, MAXSPEEDY. If the
@@ -367,7 +460,9 @@ public class Player : KinematicBody2D
 				// When player is on wall, use direction of last collision to
 				// jump away from wall and update velocity vector. Set frame
 				// lock x so that user cant go against own wall jump momentum.
-				// Also, lastCollisionDirectionX is a nonzero value.
+				// Also, lastCollisionDirectionX is a nonzero value. If on a
+				// climbable surface we dont change anything manually since
+				// exiting the area will result in isClimbing to be updated.
 				else if (wallBufferFrames > 0)
 				{
 					velocity.x = Math.Sign(lastCollisionDirectionX) * -WALLJUMPFACTORX * MAXSPEEDX;
@@ -380,7 +475,7 @@ public class Player : KinematicBody2D
 			}
 			// User is holding down the jump button after starting a jump. This
 			// is to get variable jump heights. 
-			if (userInput.y != 0 && jumpFrames != 0)
+			if (jumpStrength != 0 && jumpFrames != 0)
 			{
 				// Implementation of the variable jump height.
 				if (lastOnFloor)
@@ -490,7 +585,30 @@ public class Player : KinematicBody2D
 		playerDeathEffect.GlobalPosition = GlobalPosition;
 		QueueFree();
 	}
+	
+	// Signals
+	private void OnClimbableAreaEntered(object area)
+	{
+		isClimbing = true;
+	}
+	
+	private void OnClimbableAreaExited(object area)
+	{
+		isClimbing = false;
+	}
+	
+	private void OnFixedBounceableAreaEntered(object area)
+	{
+		velocity.y = (jumpBufferFrames > 0) ? -500 : -400;
+		// dont need to set jumpBufferFrames = 0 since unexpected that
+		// player will touch the ground in 10 frames or less
+		// should this give a bounce reletive to the fallrate of the player?
+		// should this be a constant bounce?
+	}
+	
+	private void OnHurtboxBodyAreaEntered(object area)
+	{
+		GD.Print("Player: I was hurt");
+	}
+	
 }
-
-
-
