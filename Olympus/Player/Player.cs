@@ -59,6 +59,7 @@ public class Player : KinematicBody2D
 	// Player Movement Variables
 	private Vector2 velocity = new Vector2(0,0);
 	private Vector2 userInput = new Vector2(0,0);
+	private bool isDead = false;
 	private bool canClimb = false;
 	private bool lastOnFloor = false;
 	private bool justPressedJump = false;
@@ -95,7 +96,8 @@ public class Player : KinematicBody2D
 	{ 
 		//Setting up signals
 		baseWorld = this.Owner as World;
-		if(baseWorld == null){
+		if(baseWorld == null)
+		{
 			throw new ArgumentNullException("World is not found");
 		}
 		Connect("PlayerDeath", baseWorld, "HandlePlayerDeath");
@@ -120,20 +122,25 @@ public class Player : KinematicBody2D
 	{
 		//Checking collisions
 		int totalCollisions = GetSlideCount();
-		for(int i = 0; i < totalCollisions; i++){
+		for(int i = 0; i < totalCollisions; i++)
+		{
 			KinematicCollision2D currentCollision = GetSlideCollision(i);
 			Godot.Object collidedWith = currentCollision.Collider;
-			if((collidedWith as TMDanger) != null){
+			if ((collidedWith as TMDanger) != null)
+			{
 				EmitSignal("PlayerDeath");
 				GD.Print("Player has died");
 
-				//TO-DO : Implement a player death animation - this is a stub
-				QueueFree();
-			}else
-			if((collidedWith as TMClimable) != null){
+				// this bool begins death animation
+				isDead = true;
+			}
+			else if ((collidedWith as TMClimable) != null)
+			{
 				canClimb = true;
 				GD.Print("Touch a climable surface");
 				//TO-DO : Add climbing functionality and movement
+				// Climbing functionality will most likely not be part
+				// of TileMap, but just an Area2D scene.
 				
 			}
 		}
@@ -418,7 +425,15 @@ public class Player : KinematicBody2D
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
 	}
 	
-	// Plays the correct animation
+	// Plays the animations for the Player within one function
+	// rather than split among multiple functions
+	//
+	// Parameters 
+	// ----------
+	//
+	// Returns
+	// -------
+	//
 	private void PlayAnimation()
 	{
 		// determines where player faces
@@ -445,14 +460,36 @@ public class Player : KinematicBody2D
 					playerAnimation.Play("WallSlide");
 				else
 					playerAnimation.Play("Jump1");
-				
 		}
 		
 		// Dash
 		if (isDashing)
-		{
 			playerAnimation.Play("Dash");
-		}
+
+		// Death
+		if (isDead)
+			PlayDeathAnimation();
+	}
+	
+	// Instances a player death animation that is independent from
+	// the player. Plays player death animation
+	//
+	// Parameters 
+	// ----------
+	//
+	// Returns
+	// -------
+	//
+	private void PlayDeathAnimation()
+	{
+		GD.Print("Dying");
+		PackedScene PlayerDeath = GD.Load<PackedScene>("res://Player/PlayerDeath.tscn");
+		Node2D playerDeathEffect = (Node2D) PlayerDeath.Instance();
+		// NOTE: Must add instance as child of world, not player because player will be freed
+		// 		 and instance will not be able to access player
+		GetParent().AddChild(playerDeathEffect); 
+		playerDeathEffect.GlobalPosition = GlobalPosition;
+		QueueFree();
 	}
 }
 

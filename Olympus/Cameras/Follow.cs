@@ -11,6 +11,8 @@ public class Follow : Camera2D
 	// Camera Variables
 	private Vector2 zoom = new Vector2(1, 1);
 
+	// [Consider] [TODO] Make camera parent of world not player
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
