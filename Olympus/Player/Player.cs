@@ -502,8 +502,8 @@ public class Player : KinematicBody2D
 		}
 	}
 	
-	// Helper function to do "linear introperlation" without having to caluclate
-	// it automatically and just make it depend on a known working function.
+	// Helper function to do linear-introperlation without having to caluclate
+	// it manually and just make it depend on a known working function.
 	// 
 	// Parameters 
 	// ----------
@@ -520,8 +520,8 @@ public class Player : KinematicBody2D
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
 	}
 	
-	// Plays the animations for the Player within one function
-	// rather than split among multiple functions
+	// Plays the animations for the Player within one function rather than 
+	// split among multiple functions
 	//
 	// Parameters 
 	// ----------
@@ -566,8 +566,8 @@ public class Player : KinematicBody2D
 			PlayDeathAnimation();
 	}
 	
-	// Instances a player death animation that is independent from
-	// the player. Plays player death animation
+	// Instances a player death animation that is independent from the player. 
+	// Plays player death animation
 	//
 	// Parameters 
 	// ----------
@@ -579,36 +579,80 @@ public class Player : KinematicBody2D
 	{
 		PackedScene PlayerDeath = GD.Load<PackedScene>("res://Player/PlayerDeath.tscn");
 		Node2D playerDeathEffect = (Node2D) PlayerDeath.Instance();
-		// NOTE: Must add instance as child of world, not player because player will be freed
-		// 		 and instance will not be able to access player
+		// NOTE: Must add instance as child of world, not player because player
+		// will be freed and instance will not be able to access player
 		GetParent().AddChild(playerDeathEffect); 
 		playerDeathEffect.GlobalPosition = GlobalPosition;
 		QueueFree();
 	}
 	
-	// Signals
+	// =============================== Signals ===============================
+	// =============================== Signals ===============================
+	// =============================== Signals ===============================
+	
+	// Signal - Puts the player in a climbing state when there is a collision
+	// with a climbable area2d effectbox.
+	//
+	// Parameters 
+	// ----------
+	// area : area2d that was collided with
+	//
+	// Returns
+	// -------
+	//
 	private void OnClimbableAreaEntered(object area)
 	{
 		isClimbing = true;
 	}
 	
+	// Signal - Puts player in a normal state when no longer colliding with a
+	// climbable area2d effectbox.
+	//
+	// Parameters 
+	// ----------
+	// area : area2d that was collided with
+	//
+	// Returns
+	// -------
+	//
 	private void OnClimbableAreaExited(object area)
 	{
 		isClimbing = false;
 	}
 	
+	// Signal - Makes the player jump some fixed height when colliding with
+	// some effect box. Uses jumpBufferFrames to make sure that the player
+	// can jumped right when hitting this box and get a bigger jump.
+	//
+	// Parameters 
+	// ----------
+	// area : area2d that was collided with
+	//
+	// Returns
+	// -------
+	//
 	private void OnFixedBounceableAreaEntered(object area)
 	{
+		// dont need to set jumpBufferFrames = 0 since it is unexpected that
+		// the player will touch the ground in 10 frames or less. If we really
+		// wanted to do it, we could need another conditional expression or
+		// statement to do this here.
 		velocity.y = (jumpBufferFrames > 0) ? -500 : -400;
-		// dont need to set jumpBufferFrames = 0 since unexpected that
-		// player will touch the ground in 10 frames or less
-		// should this give a bounce reletive to the fallrate of the player?
-		// should this be a constant bounce?
 	}
 	
+	// Signal - since the player only has one HP (health point) then whenever
+	// we collide with anything on our hurtbox, we are automatically dead.
+	//
+	// Parameters 
+	// ----------
+	// area : area2d that we collided with
+	// 
+	// Returns
+	// -------
+	//
 	private void OnHurtboxBodyAreaEntered(object area)
 	{
-		GD.Print("Player: I was hurt");
+		isDead = true;
 	}
 	
 }

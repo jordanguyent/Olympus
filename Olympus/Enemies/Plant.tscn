@@ -5,13 +5,13 @@
 [ext_resource path="res://Boxes/Hitbox.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Enemies/Plant.cs" type="Script" id=4]
 
-[sub_resource type="RectangleShape2D" id=4]
+[sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 6.10983, 7.89397 )
 
-[sub_resource type="RectangleShape2D" id=5]
+[sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 8, 12 )
 
-[sub_resource type="RectangleShape2D" id=6]
+[sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 8, 12 )
 
 [node name="Plant" type="StaticBody2D"]
@@ -21,7 +21,7 @@ script = ExtResource( 4 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( -0.176777, 2.65165 )
-shape = SubResource( 4 )
+shape = SubResource( 1 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -38,14 +38,14 @@ collision_layer = 8
 
 [node name="CollisionShape2D" parent="Hurtbox(Body)" index="0"]
 position = Vector2( 7.62939e-06, 2.64865 )
-shape = SubResource( 5 )
+shape = SubResource( 2 )
 
 [node name="Hitbox(Attack)" parent="." instance=ExtResource( 3 )]
 collision_mask = 4
 
 [node name="CollisionShape2D" parent="Hitbox(Attack)" index="0"]
 position = Vector2( 0, 2.64865 )
-shape = SubResource( 6 )
+shape = SubResource( 3 )
 [connection signal="area_entered" from="Hurtbox(Body)" to="." method="OnHurtboxBodyAreaEntered"]
 
 [editable path="Hurtbox(Body)"]
