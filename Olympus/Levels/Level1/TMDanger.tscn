@@ -4,76 +4,76 @@
 [ext_resource path="res://Levels/Level1/TMDanger.cs" type="Script" id=2]
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
-points = PoolVector2Array( 8, 8, 0, 8, 0, 2, 8, 2 )
+points = PoolVector2Array( 7, 8, 1, 8, 1, 2, 7, 2 )
 
 [sub_resource type="ConvexPolygonShape2D" id=2]
-points = PoolVector2Array( 8, 8, 0, 8, 0, 2, 8, 2 )
+points = PoolVector2Array( 7, 8, 1, 8, 1, 2, 7, 2 )
 
 [sub_resource type="ConvexPolygonShape2D" id=3]
-points = PoolVector2Array( 8, 8, 0, 8, 0, 2, 8, 2 )
+points = PoolVector2Array( 7, 8, 1, 8, 1, 2, 7, 2 )
 
 [sub_resource type="ConvexPolygonShape2D" id=4]
-points = PoolVector2Array( 8, 8, 0, 8, 0, 2, 8, 2 )
+points = PoolVector2Array( 7, 8, 1, 8, 1, 2, 7, 2 )
 
 [sub_resource type="ConvexPolygonShape2D" id=5]
-points = PoolVector2Array( 8, 6, 0, 6, 0, 0, 8, 0 )
+points = PoolVector2Array( 7, 6, 1, 6, 1, 0, 7, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=6]
-points = PoolVector2Array( 8, 6, 0, 6, 0, 0, 8, 0 )
+points = PoolVector2Array( 7, 6, 1, 6, 1, 0, 7, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=7]
-points = PoolVector2Array( 8, 6, 0, 6, 0, 0, 8, 0 )
+points = PoolVector2Array( 7, 6, 1, 6, 1, 0, 7, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=8]
-points = PoolVector2Array( 8, 6, 0, 6, 0, 0, 8, 0 )
+points = PoolVector2Array( 7, 6, 1, 6, 1, 0, 7, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=9]
-points = PoolVector2Array( 0, 0, 6, 0, 6, 8, 0, 8 )
+points = PoolVector2Array( 0, 1, 6, 1, 6, 7, 0, 7 )
 
 [sub_resource type="ConvexPolygonShape2D" id=10]
-points = PoolVector2Array( 6, 8, 0, 8, 0, 0, 6, 0 )
+points = PoolVector2Array( 6, 7, 0, 7, 0, 1, 6, 1 )
 
 [sub_resource type="ConvexPolygonShape2D" id=11]
-points = PoolVector2Array( 6, 8, 0, 8, 0, 0, 6, 0 )
+points = PoolVector2Array( 6, 7, 0, 7, 0, 1, 6, 1 )
 
 [sub_resource type="ConvexPolygonShape2D" id=12]
-points = PoolVector2Array( 6, 8, 0, 8, 0, 0, 6, 0 )
+points = PoolVector2Array( 6, 7, 0, 7, 0, 1, 6, 1 )
 
 [sub_resource type="ConvexPolygonShape2D" id=13]
-points = PoolVector2Array( 2, 0, 8, 0, 8, 8, 2, 8 )
+points = PoolVector2Array( 2, 1, 8, 1, 8, 7, 2, 7 )
 
 [sub_resource type="ConvexPolygonShape2D" id=14]
-points = PoolVector2Array( 2, 0, 8, 0, 8, 8, 2, 8 )
+points = PoolVector2Array( 2, 1, 8, 1, 8, 7, 2, 7 )
 
 [sub_resource type="ConvexPolygonShape2D" id=15]
-points = PoolVector2Array( 2, 0, 8, 0, 8, 8, 2, 8 )
+points = PoolVector2Array( 2, 1, 8, 1, 8, 7, 2, 7 )
 
 [sub_resource type="ConvexPolygonShape2D" id=16]
-points = PoolVector2Array( 2, 0, 8, 0, 8, 8, 2, 8 )
+points = PoolVector2Array( 2, 1, 8, 1, 8, 7, 2, 7 )
 
 [sub_resource type="ConvexPolygonShape2D" id=17]
-points = PoolVector2Array( 8, 8, 0, 8, 0, 0, 8, 0 )
+points = PoolVector2Array( 7, 7, 0, 7, 0, 0, 7, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=18]
-points = PoolVector2Array( 8, 8, 0, 8, 0, 0, 8, 0 )
+points = PoolVector2Array( 8, 7, 1, 7, 1, 0, 8, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=19]
-points = PoolVector2Array( 8, 8, 0, 8, 0, 0, 8, 0 )
+points = PoolVector2Array( 7, 8, 0, 8, 0, 1, 7, 1 )
 
 [sub_resource type="ConvexPolygonShape2D" id=20]
-points = PoolVector2Array( 8, 8, 0, 8, 0, 0, 8, 0 )
+points = PoolVector2Array( 8, 8, 1, 8, 1, 1, 8, 1 )
 
 [sub_resource type="ConvexPolygonShape2D" id=21]
-points = PoolVector2Array( 8, 8, 2, 8, 2, 2, 8, 2 )
+points = PoolVector2Array( 8, 8, 3, 8, 3, 3, 8, 3 )
 
 [sub_resource type="ConvexPolygonShape2D" id=22]
-points = PoolVector2Array( 6, 8, 0, 8, 0, 2, 6, 2 )
+points = PoolVector2Array( 5, 8, 0, 8, 0, 3, 5, 3 )
 
 [sub_resource type="ConvexPolygonShape2D" id=23]
-points = PoolVector2Array( 8, 6, 2, 6, 2, 0, 8, 0 )
+points = PoolVector2Array( 8, 5, 3, 5, 3, 0, 8, 0 )
 
 [sub_resource type="ConvexPolygonShape2D" id=24]
-points = PoolVector2Array( 6, 6, 0, 6, 0, 0, 6, 0 )
+points = PoolVector2Array( 5, 5, 0, 5, 0, 0, 5, 0 )
 
 [sub_resource type="TileSet" id=25]
 0/name = "SpikesTileset.png 0"

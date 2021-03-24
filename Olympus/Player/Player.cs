@@ -482,7 +482,6 @@ public class Player : KinematicBody2D
 	//
 	private void PlayDeathAnimation()
 	{
-		GD.Print("Dying");
 		PackedScene PlayerDeath = GD.Load<PackedScene>("res://Player/PlayerDeath.tscn");
 		Node2D playerDeathEffect = (Node2D) PlayerDeath.Instance();
 		// NOTE: Must add instance as child of world, not player because player will be freed
