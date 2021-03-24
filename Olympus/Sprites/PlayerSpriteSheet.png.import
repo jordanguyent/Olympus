@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/MushroomSpriteSheet.png-d096643079b01a2b5f938883cbd91949.stex"
+path="res://.import/PlayerSpriteSheet.png-d72a160ece3f69390b8beacc09b7c17e.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Level1/MushroomSpriteSheet.png"
-dest_files=[ "res://.import/MushroomSpriteSheet.png-d096643079b01a2b5f938883cbd91949.stex" ]
+source_file="res://Sprites/PlayerSpriteSheet.png"
+dest_files=[ "res://.import/PlayerSpriteSheet.png-d72a160ece3f69390b8beacc09b7c17e.stex" ]
 
 [params]
 

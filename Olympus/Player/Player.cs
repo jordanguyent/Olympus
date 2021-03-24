@@ -134,6 +134,9 @@ public class Player : KinematicBody2D
 		
 		// Makes every new position a while number in the form of a float. This
 		// is to stop the screen from jittering and shaking randomly. 
+		// snaps pixels to nearest pixel to remove pixel jitter
+		// another solution is snapping camera to nearest pixel
+		// problem with pixels stretching is because we scaled player.
 		Position = new Vector2((float)Math.Round(Position.x), (float)Math.Round(Position.y));
 	}
 
@@ -500,9 +503,9 @@ public class Player : KinematicBody2D
 				playerAnimation.Play("Jump0");
 			else if (velocity.y > 0)
 				if (IsOnWall())
-					playerAnimation.Play("Climb");
+					playerAnimation.Play("WallSlide");
 				else
-					playerAnimation.Play("Jump2");
+					playerAnimation.Play("Jump1");
 				
 		}
 		
