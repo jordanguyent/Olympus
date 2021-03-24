@@ -27,7 +27,13 @@ using System;
 // is there anything that should be commented here?
 public class Player : KinematicBody2D
 {
-	// Wolrd Movement Constants
+	//Base world node
+	World baseWorld;
+
+	//Signals
+	[Signal] public delegate void PlayerDeath();
+
+	// World Movement Constants
 	[Export] int MAXSPEEDX = 100;
 	[Export] int MAXSPEEDY = 300;
 	[Export] int ACCELERATION = 1000;
@@ -53,6 +59,7 @@ public class Player : KinematicBody2D
 	// Player Movement Variables
 	private Vector2 velocity = new Vector2(0,0);
 	private Vector2 userInput = new Vector2(0,0);
+	private bool canClimb = false;
 	private bool lastOnFloor = false;
 	private bool justPressedJump = false;
 	private bool isFastFalling = false;
@@ -86,6 +93,13 @@ public class Player : KinematicBody2D
 	//   
 	public override void _Ready() 
 	{ 
+		//Setting up signals
+		baseWorld = this.Owner as World;
+		if(baseWorld == null){
+			throw new ArgumentNullException("World is not found");
+		}
+		Connect("PlayerDeath", baseWorld, "HandlePlayerDeath");
+
 		// Retrieves the Player's AnimatedSprite node in order to call its 
 		// methods.
 		playerAnimation = GetNode<AnimatedSprite>("AnimatedSprite");
@@ -104,6 +118,26 @@ public class Player : KinematicBody2D
 	//   
 	public override void _PhysicsProcess(float delta)
 	{
+		//Checking collisions
+		int totalCollisions = GetSlideCount();
+		for(int i = 0; i < totalCollisions; i++){
+			KinematicCollision2D currentCollision = GetSlideCollision(i);
+			Godot.Object collidedWith = currentCollision.Collider;
+			if((collidedWith as TMDanger) != null){
+				EmitSignal("PlayerDeath");
+				GD.Print("Player has died");
+
+				//TO-DO : Implement a player death animation - this is a stub
+				QueueFree();
+			}else
+			if((collidedWith as TMClimable) != null){
+				canClimb = true;
+				GD.Print("Touch a climable surface");
+				//TO-DO : Add climbing functionality and movement
+				
+			}
+		}
+
 		// Update player based on user inputs so we may make calculations
 		// about their movement consistently in the following functions.
 		HelperUpdatePlayerState();
