@@ -34,8 +34,8 @@ public class Player : KinematicBody2D
 	[Export] int GRAVITY = 900;
 	[Export] int JUMPSPEED = -200;
 	[Export] int ONWALLFALLSPEED = 100;
-	[Export] int MAXCLIMBSPEED = 100;
-	[Export] int CLIMBACCELERATION = 500;
+	[Export] int MAXCLIMBSPEED = 100; // stub
+	[Export] int CLIMBACCELERATION = 500; // stub
 	[Export] float WALLFRICTIONFACTOR = .01f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.2f;
@@ -130,8 +130,7 @@ public class Player : KinematicBody2D
 		velocity = MoveAndSlide(velocity, -1 * E2);
 
 		// Plays correct animation
-		PlayAnimation();
-		
+		PlayAnimation();		
 		// Makes every new position a while number in the form of a float. This
 		// is to stop the screen from jittering and shaking randomly. 
 		// snaps pixels to nearest pixel to remove pixel jitter
@@ -336,10 +335,7 @@ public class Player : KinematicBody2D
 		if (frameLockY == 0)
 		{
 			// Calculate the wall friction factor so that we may have smooth
-			// player movement when falling/sliding/moving on walls. Since 
-			// WALLFRICTIONFACTOR is so small, the player is allowed to stay
-			// on a wall for a while before begining to slide down. This is an
-			// accidental feature, but a good one to have :)
+			// player movement when falling/sliding/moving on walls.
 			wallFrictionFactor = (velocity.y > ONWALLFALLSPEED) ? 1.5f : WALLFRICTIONFACTOR;
 
 			// Implementation of climbing controls. Make sure that the player
@@ -526,16 +522,12 @@ public class Player : KinematicBody2D
 	{
 		isClimbing = false;
 	}
-	
-	private void OnFixedBounceableAreaEntered(object area)
-	{
-		velocity.y = (jumpBufferFrames > 0) ? -500 : -400;
-		// dont need to set jumpBufferFrames = 0 since unexpected that
-		// player will touch the ground in 10 frames or less
-		// should this give a bounce reletive to the fallrate of the player?
-		// should this be a constant bounce?
-	}
-	
 }
+
+
+
+
+
+
 
 
