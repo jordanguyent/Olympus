@@ -5,8 +5,9 @@ public class PlantProjectile : KinematicBody2D
 {
 	// Constants
 	[Export] private int MAXSPEED = 250;
-	private Vector2 velocity = new Vector2(0,0);
 	
+	// Variables
+	private Vector2 velocity = new Vector2(0,0);
 	public float theta = 0;
 
 	// Called when the node enters the scene tree for the first time.
@@ -34,4 +35,3 @@ public class PlantProjectile : KinematicBody2D
 		QueueFree();
 	}
 }
-

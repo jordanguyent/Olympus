@@ -10,27 +10,45 @@ using System;
 // [ CONSIDER ] : discussions for future meets
 // [ WARNING ]  : issues with code
 // 
+// CODE STYLE
+// ----------
+// - Try to comment "why" we do things, not just "what" we are doing.
+// - Comments are not to exceed the 80 character line mark, like this sentence.
+// - Keep the standard comment above every function.
+// |
+// - MyClass, MyFunction, myVariable, MYCONSTANT
+// - Every variable should be initialized, at least to 0, null, etc.
+// - } and { should take a line each and should be included for ALL if/if else/
+// else/for/while/do/switch statments
+// - always decrement frame counters to 0 instead of counting up
+// 
 // GOALS FOR FUTURE MEETS 
 // ----------------------
-// * why does the ball follow the player and is not independent anymore?
-// * make it so that the ball does not collide with the player when player is
-//		throwing the ball. Basically, the ball should only begin to bounce off
-//		the player after it has collided with one other thing.
-// * make it so that the player takes some of the momentum and bounces off of
-// 		the ball. (user more signals)
-// * 
-// * clean things in the code. see todo and warnings
 // 
-// * build a sample level
-// * animations (later)
 
-// is there anything that should be commented here?
+// All functions contained in this class appear as follows in the order:
+// 
+// public override void _Ready() 
+// public override void _PhysicsProcess(float delta)
+// private void HelperUpdatePlayerState()
+// private void HelperUpdateVelocityX(float delta)
+// private void HelperUpdateVelocityY(float delta)
+// private void HelperUpdateVelocityOnJump(bool justPressedJump)
+// private float HelperMoveToward(float current, float desire, float acceleration)
+// private void PlayAnimation()
+// private void PlayDeathAnimation()
+// 
+// private void OnClimbableAreaEntered(object area)
+// private void OnClimbableAreaExited(object area)
+// private void OnFixedBounceableAreaEntered(object area)
+// private void OnHurtboxBodyAreaEntered(object area)
+// 
 public class Player : KinematicBody2D
 {
-	//Base world node
-	World baseWorld;
+	// Base world node
+	World baseWorld = null;
 
-	//Signals
+	// Signals
 	[Signal] public delegate void PlayerDeath();
 
 	// World Movement Constants
@@ -92,7 +110,7 @@ public class Player : KinematicBody2D
 	// [TODO] Try animationTree and Player since it provides more functionality. 
 	// Try both methods, see what works best
 	
-	//  Called when the node enters the scene tree for the first time.
+	// Called when the node enters the scene tree for the first time.
 	// Called when the node enters the scene tree for the first time. Used to
 	// connect signals from Player to its child nodes like Ball.
 	//
@@ -104,7 +122,7 @@ public class Player : KinematicBody2D
 	//   
 	public override void _Ready() 
 	{ 
-		//Setting up signals
+		// Setting up signals
 		baseWorld = this.Owner as World;
 		if(baseWorld == null)
 		{
@@ -130,7 +148,7 @@ public class Player : KinematicBody2D
 	//   
 	public override void _PhysicsProcess(float delta)
 	{
-		//Checking collisions
+		// Checking collisions
 		int totalCollisions = GetSlideCount();
 		for(int i = 0; i < totalCollisions; i++)
 		{
@@ -147,8 +165,9 @@ public class Player : KinematicBody2D
 			else if ((collidedWith as TMClimable) != null)
 			{
 				canClimb = true;
+				isClimbing = true;
 				GD.Print("Touch a climable surface");
-				//TO-DO : Add climbing functionality and movement
+				// TO-DO : Add climbing functionality and movement
 				// Climbing functionality will most likely not be part
 				// of TileMap, but just an Area2D scene.
 				
@@ -533,37 +552,57 @@ public class Player : KinematicBody2D
 	{
 		// determines where player faces
 		if (velocity.x < 0)
+		{
 			playerAnimation.FlipH = true;
+		}
 		else if (velocity.x > 0)
+		{
 			playerAnimation.FlipH = false;
+		}
 
 		// Running
 		if (IsOnFloor())
 		{
 			if (velocity.x != 0)
+			{
 				playerAnimation.Play("Run");
+			}
 			else
+			{
 				playerAnimation.Play("Idle");
+			}
 		} 
 		// Jump
 		else 
 		{	
 			if (velocity.y < 0)
+			{
 				playerAnimation.Play("Jump0");
+			}
 			else if (velocity.y > 0)
+			{
 				if (IsOnWall())
+				{
 					playerAnimation.Play("WallSlide");
+				}
 				else
+				{
 					playerAnimation.Play("Jump1");
+				}
+			}
 		}
 		
 		// Dash
 		if (isDashing)
+		{
 			playerAnimation.Play("Dash");
+		}
 
 		// Death
 		if (isDead)
+		{
 			PlayDeathAnimation();
+		}
 	}
 	
 	// Instances a player death animation that is independent from the player. 
