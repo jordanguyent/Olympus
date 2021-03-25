@@ -58,7 +58,7 @@ public class Player : KinematicBody2D
 	[Export] int GRAVITY = 900;
 	[Export] int JUMPSPEED = -200;
 	[Export] int ONWALLFALLSPEED = 100;
-	[Export] int MAXCLIMBSPEED = 100;
+	[Export] int MAXCLIMBSPEED = 80;
 	[Export] int CLIMBACCELERATION = 500;
 	[Export] float WALLFRICTIONFACTOR = .01f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
@@ -82,7 +82,6 @@ public class Player : KinematicBody2D
 	private Vector2 velocity = new Vector2(0,0);
 	private Vector2 userInput = new Vector2(0,0);
 	private bool isDead = false;
-	private bool canClimb = false;
 	private bool lastOnFloor = false;
 	private bool justPressedJump = false;
 	private bool isFastFalling = false;
@@ -162,15 +161,18 @@ public class Player : KinematicBody2D
 				// this bool begins death animation
 				isDead = true;
 			}
-			else if ((collidedWith as TMClimable) != null)
+			if ((collidedWith as TMClimable) != null)
 			{
-				canClimb = true;
 				isClimbing = true;
 				GD.Print("Touch a climable surface");
 				// TO-DO : Add climbing functionality and movement
 				// Climbing functionality will most likely not be part
 				// of TileMap, but just an Area2D scene.
 				
+			} 
+			else
+			{
+				isClimbing = false;
 			}
 		}
 
@@ -412,7 +414,7 @@ public class Player : KinematicBody2D
 				// sign so that the up direction is negative as it should be.
 				if (userInput.y != 0)
 				{
-					velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * ONWALLFALLSPEED, delta * CLIMBACCELERATION);
+					velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * MAXCLIMBSPEED, delta * CLIMBACCELERATION);
 				}
 				// if the player is ONLY pressed up against the wall dont fall.
 				else if (userInput.y == 0)
@@ -573,7 +575,7 @@ public class Player : KinematicBody2D
 			}
 		} 
 		// Jump
-		else 
+		else if (!isClimbing)
 		{	
 			if (velocity.y < 0)
 			{
@@ -590,6 +592,17 @@ public class Player : KinematicBody2D
 					playerAnimation.Play("Jump1");
 				}
 			}
+		}
+		else
+		{
+			if (velocity.y != 0 && IsOnWall())
+				playerAnimation.Play("Climb");
+			else if (velocity.y == 0 && IsOnWall())
+				playerAnimation.Play("WallSlide");
+			else if (velocity.y < 0)
+				playerAnimation.Play("Jump0");
+			else
+				playerAnimation.Play("Jump1");
 		}
 		
 		// Dash
@@ -628,36 +641,6 @@ public class Player : KinematicBody2D
 	// =============================== Signals ===============================
 	// =============================== Signals ===============================
 	// =============================== Signals ===============================
-	
-	// Signal - Puts the player in a climbing state when there is a collision
-	// with a climbable area2d effectbox.
-	//
-	// Parameters 
-	// ----------
-	// area : area2d that was collided with
-	//
-	// Returns
-	// -------
-	//
-	private void OnClimbableAreaEntered(object area)
-	{
-		isClimbing = true;
-	}
-	
-	// Signal - Puts player in a normal state when no longer colliding with a
-	// climbable area2d effectbox.
-	//
-	// Parameters 
-	// ----------
-	// area : area2d that was collided with
-	//
-	// Returns
-	// -------
-	//
-	private void OnClimbableAreaExited(object area)
-	{
-		isClimbing = false;
-	}
 	
 	// Signal - Makes the player jump some fixed height when colliding with
 	// some effect box. Uses jumpBufferFrames to make sure that the player
