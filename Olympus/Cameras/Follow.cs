@@ -17,7 +17,6 @@ public class Follow : Camera2D
 	public override void _Ready()
 	{
 		UpdateZoom(STANDARDSCALE, STANDARDSCALE);
-		NoFollow();
 		MakeCurrent();
 	}
 	
