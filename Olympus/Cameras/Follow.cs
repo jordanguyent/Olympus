@@ -17,6 +17,7 @@ public class Follow : Camera2D
 	public override void _Ready()
 	{
 		UpdateZoom(STANDARDSCALE, STANDARDSCALE);
+		NoFollow();
 		MakeCurrent();
 	}
 	
@@ -57,7 +58,7 @@ public class Follow : Camera2D
 		LimitBottom = 0;
 		LimitTop = 0;
 		LimitLeft = 0;
-		LimitRight = 480;
+		LimitRight = 1000;
 	}
 	
 	public void SetLimits(int up, int down, int left, int right)

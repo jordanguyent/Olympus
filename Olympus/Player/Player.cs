@@ -56,8 +56,8 @@ public class Player : KinematicBody2D
 	[Export] int MAXSPEEDX = 100;
 	[Export] int MAXSPEEDY = 300;
 	[Export] int ACCELERATION = 1000;
-	[Export] int GRAVITY = 900;
-	[Export] int JUMPSPEED = -200;
+	[Export] int GRAVITY = 1350;
+	[Export] int JUMPSPEED = -202;
 	[Export] int ONWALLFALLSPEED = 100;
 	[Export] int MAXCLIMBSPEED = 80;
 	[Export] int CLIMBACCELERATION = 500;
@@ -65,7 +65,7 @@ public class Player : KinematicBody2D
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.2f;
 	[Export] int DEFAULTDASHCOUNT = 1;
-	[Export] int DASHSPEED = 300;
+	[Export] int DASHSPEED = 310;
 	private Vector2 E1 = new Vector2(1, 0);
 	private Vector2 E2 = new Vector2(0, 1);
 
@@ -73,7 +73,7 @@ public class Player : KinematicBody2D
 	[Export] int MAXJUMPFRAME = 10;
 	[Export] int FRAMELOCKXY = 5;
 	[Export] int INPUTBUFFERMAX = 5;
-	[Export] int DASHFRAMELOCK = 10;
+	[Export] int DASHFRAMELOCK = 9;
 	[Export] int ATTACKFRAMELOCK = 10;
 	[Export] int WALLBUFFERMAX = 5;
 
