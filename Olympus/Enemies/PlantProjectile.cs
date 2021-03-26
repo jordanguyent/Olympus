@@ -34,4 +34,9 @@ public class PlantProjectile : KinematicBody2D
 		GD.Print("Projectile: Collided with something");
 		QueueFree();
 	}
+	
+	private void OnBodyEntered(object body)
+	{
+		QueueFree();
+	}
 }

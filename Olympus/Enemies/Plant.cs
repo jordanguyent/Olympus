@@ -4,7 +4,7 @@ using System;
 public class Plant : StaticBody2D
 {
 	// Constants
-	private int SHOOTFRAMES = 30;
+	[Export] private int SHOOTFRAMES = 50;
 
 	// Variables
 	[Export] private int timer = 0;

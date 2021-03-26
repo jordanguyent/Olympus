@@ -124,6 +124,7 @@ public class Player : KinematicBody2D
 	{ 
 		// Setting up signals
 		baseWorld = this.Owner as World;
+		GD.Print(this.Owner.GetType());
 		if(baseWorld == null)
 		{
 			throw new ArgumentNullException("Edwin: World is not found");
@@ -188,12 +189,9 @@ public class Player : KinematicBody2D
 		// Plays correct animation
 		PlayAnimation();
 		
-		// Makes every new position a while number in the form of a float. This
-		// is to stop the screen from jittering and shaking randomly. 
-		// snaps pixels to nearest pixel to remove pixel jitter
-		// another solution is snapping camera to nearest pixel
-		// problem with pixels stretching is because we scaled player.
-		Position = new Vector2((float)Math.Round(Position.x), (float)Math.Round(Position.y));
+		// Snaps the position of Player to nearest pixel
+		// Removes jittering of pixels
+		Position = Position.Snapped(Vector2.One);
 	}
 
 	// Supposed to record the inputs from the user at the start of each fram so

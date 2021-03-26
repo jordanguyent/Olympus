@@ -8,6 +8,7 @@ public class PlantProjectileHitbox : Area2D
 	
 	// Signals
 	[Signal] public delegate void area_entered();
+	[Signal] public delegate void body_entered();
 
 	// Called when the node enters the scene tree for the first time. Connects
 	// the signal of a collision onto this hitbox to the plant projectile so
@@ -23,5 +24,6 @@ public class PlantProjectileHitbox : Area2D
 	{
 		plantProjectile = this.Owner as PlantProjectile;
 		Connect("area_entered", plantProjectile, "OnHitboxAttackAreaEntered");
+		Connect("body_entered", plantProjectile, "OnBodyEntered");
 	}
 }

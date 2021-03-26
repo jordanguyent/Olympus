@@ -17,7 +17,8 @@ public class Follow : Camera2D
 	public override void _Ready()
 	{
 		UpdateZoom(STANDARDSCALE, STANDARDSCALE);
-		NoFollow();
+		SetLimits(-192, 225, 0, 320);
+		// NoFollow();
 		MakeCurrent();
 	}
 	
@@ -49,7 +50,7 @@ public class Follow : Camera2D
 	{
 		// These are variables that are defined in parent class
 		LimitLeft = 0;
-		LimitRight = 480;
+		LimitRight = 320;
 	}
 	
 	public void NoFollow()

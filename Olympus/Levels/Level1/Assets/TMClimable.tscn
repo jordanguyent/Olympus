@@ -3,7 +3,6 @@
 [ext_resource path="res://Sprites/Level1/ClimableGrassSpriteSheet.png" type="Texture" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMClimable.cs" type="Script" id=2]
 
-
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 0, 0, 8, 0, 8, 8, 0, 8 )
 
