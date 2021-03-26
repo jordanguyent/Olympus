@@ -56,14 +56,14 @@ public class Player : KinematicBody2D
 	[Export] int MAXSPEEDX = 100;
 	[Export] int MAXSPEEDY = 300;
 	[Export] int ACCELERATION = 1000;
-	[Export] int GRAVITY = 1350;
-	[Export] int JUMPSPEED = -202;
+	[Export] int GRAVITY = 1450;
+	[Export] int JUMPSPEED = -205;
 	[Export] int ONWALLFALLSPEED = 100;
 	[Export] int MAXCLIMBSPEED = 80;
 	[Export] int CLIMBACCELERATION = 500;
 	[Export] float WALLFRICTIONFACTOR = .01f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
-	[Export] float WALLJUMPFACTORY = 1.2f;
+	[Export] float WALLJUMPFACTORY = 1.4f;
 	[Export] int DEFAULTDASHCOUNT = 1;
 	[Export] int DASHSPEED = 310;
 	private Vector2 E1 = new Vector2(1, 0);
@@ -201,6 +201,7 @@ public class Player : KinematicBody2D
 		// another solution is snapping camera to nearest pixel
 		// problem with pixels stretching is because we scaled player.
 		Position = new Vector2((float)Math.Round(Position.x), (float)Math.Round(Position.y));
+		GD.Print(lastFacingDirection);
 	}
 
 	// Supposed to record the inputs from the user at the start of each fram so
@@ -554,11 +555,11 @@ public class Player : KinematicBody2D
 	private void PlayAnimation()
 	{
 		// determines where player faces
-		if (velocity.x < 0)
+		if (lastFacingDirection == -1)
 		{
 			playerAnimation.FlipH = true;
 		}
-		else if (velocity.x > 0)
+		else if (lastFacingDirection == 1)
 		{
 			playerAnimation.FlipH = false;
 		}
