@@ -2,7 +2,8 @@
 
 [ext_resource path="res://Sprites/Level1/MushroomSpriteSheet.png" type="Texture" id=1]
 [ext_resource path="res://Boxes/Effectbox.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Levels/Level1/MushroomEffect.cs" type="Script" id=3]
+[ext_resource path="res://Levels/Level1/Assets/MushroomEffect.cs" type="Script" id=3]
+
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 7, 3 )
