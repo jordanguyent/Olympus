@@ -157,19 +157,12 @@ public class Player : KinematicBody2D
 			if ((collidedWith as TMDanger) != null)
 			{
 				EmitSignal("PlayerDeath");
-				GD.Print("Player has died");
-
 				// this bool begins death animation
 				isDead = true;
 			}
 			if ((collidedWith as TMClimable) != null)
 			{
 				isClimbing = true;
-				GD.Print("Touch a climable surface");
-				// TO-DO : Add climbing functionality and movement
-				// Climbing functionality will most likely not be part
-				// of TileMap, but just an Area2D scene.
-				
 			} 
 			else
 			{
@@ -201,7 +194,6 @@ public class Player : KinematicBody2D
 		// another solution is snapping camera to nearest pixel
 		// problem with pixels stretching is because we scaled player.
 		Position = new Vector2((float)Math.Round(Position.x), (float)Math.Round(Position.y));
-		GD.Print(lastFacingDirection);
 	}
 
 	// Supposed to record the inputs from the user at the start of each fram so
