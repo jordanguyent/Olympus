@@ -9,6 +9,7 @@ public class PlantProjectile : KinematicBody2D
 	// Variables
 	private Vector2 velocity = new Vector2(0,0);
 	public float theta = 0;
+	private Player player = null;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -37,6 +38,10 @@ public class PlantProjectile : KinematicBody2D
 	
 	private void OnBodyEntered(object body)
 	{
-		QueueFree();
+		if (body.GetType().ToString() != "Player")
+		{
+			QueueFree();
+		}
+		
 	}
 }

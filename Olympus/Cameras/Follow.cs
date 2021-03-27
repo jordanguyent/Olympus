@@ -18,8 +18,8 @@ public class Follow : Camera2D
 	{
 		UpdateZoom(STANDARDSCALE, STANDARDSCALE);
 //		SetLimits(0, 450, 0, 320); // Vertical
-		SetLimits(0, 225, -94, 1000); // Horizontal
-//		NoFollow(); // Static
+//		SetLimits(0, 225, -94, 1000); // Horizontal
+		NoFollow(); // Static
 		MakeCurrent();
 	}
 	
