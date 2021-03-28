@@ -50,7 +50,6 @@ public class Player : KinematicBody2D
 
 	// Signals
 	[Signal] public delegate void PlayerDeath();
-	[Signal] public delegate void area_entered_bounce();
 
 	// World Movement Constants
 	[Export] int MAXSPEEDX = 100;
@@ -585,6 +584,7 @@ public class Player : KinematicBody2D
 				}
 			}
 		}
+		// Climb
 		else
 		{
 			if (velocity.y != 0 && IsOnWall())
@@ -627,7 +627,6 @@ public class Player : KinematicBody2D
 		// will be freed and instance will not be able to access player
 		GetParent().AddChild(playerDeathEffect); 
 		playerDeathEffect.GlobalPosition = GlobalPosition;
-		// put camera here with position GLOBAL POSITION
 		QueueFree();
 	}
 	
@@ -646,7 +645,7 @@ public class Player : KinematicBody2D
 	// Returns
 	// -------
 	//
-	private void OnFixedBounceableAreaEntered(object area)
+	private void OnFixedBounceableAreaEntered()
 	{
 		// dont need to set jumpBufferFrames = 0 since it is unexpected that
 		// the player will touch the ground in 10 frames or less. If we really
