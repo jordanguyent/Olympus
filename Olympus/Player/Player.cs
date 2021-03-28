@@ -400,17 +400,25 @@ public class Player : KinematicBody2D
 			// wall to be considered climbing.
 			if (isClimbing && IsOnWall() && userInput.x == lastCollisionDirectionX)
 			{
+				// if the player is ONLY pressed up against the wall dont fall.
+				if (userInput.y == 0)
+				{
+					velocity.y = 0;
+				}
+				// If the player is holding a direction they want to climb and 
+				// are moving faster than they should while climbing then we 
+				// set their speed to MAXCLIMBSPEED. One of the few times we do
+				// not keep momentum.
+				else if (velocity.y > MAXCLIMBSPEED || velocity.y < -MAXCLIMBSPEED)
+				{
+					velocity.y = Math.Sign(velocity.y) * MAXCLIMBSPEED;
+				}
 				// Player is pressed up against the wall and holding up/down
 				// begin accelerating in that direction. We apply an extra -
 				// sign so that the up direction is negative as it should be.
-				if (userInput.y != 0)
+				else //if (userInput.y != 0)
 				{
 					velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * MAXCLIMBSPEED, delta * CLIMBACCELERATION);
-				}
-				// if the player is ONLY pressed up against the wall dont fall.
-				else if (userInput.y == 0)
-				{
-					velocity.y = 0;
 				}
 			}
 			// We want a "friction" like thing when player is on a wall, but 
