@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMBlocks.tscn" type="PackedScene" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Sprites/Level1/background.png" type="Texture" id=6]
 [ext_resource path="res://Levels/World.cs" type="Script" id=7]
+[ext_resource path="res://Levels/Level1/Assets/Mushroom.tscn" type="PackedScene" id=8]
 
 [node name="World" type="Node2D"]
 script = ExtResource( 7 )
@@ -33,3 +34,6 @@ tile_data = PoolIntArray( 1048588, 0, 196610, 1114124, 0, 196610, 1179660, 0, 19
 
 [node name="TMClimable" parent="." instance=ExtResource( 4 )]
 tile_data = PoolIntArray( 131107, 0, 196610, 196643, 0, 196610, 262171, 0, 196611, 262177, 0, 131074, 262179, 0, 196609, 327707, 0, 196608, 327713, 0, 131073, 327715, 0, 196609, 393243, 0, 196610, 393249, 0, 131073, 393251, 0, 196609, 458779, 0, 196610, 458785, 0, 131074, 458787, 0, 196609, 524315, 0, 196608, 524321, 0, 131075, 524323, 0, 196609, 589857, 0, 131075, 589859, 0, 196609, 655393, 0, 131074, 655395, 0, 196609, 720929, 0, 131073, 720931, 0, 196609, 786465, 0, 131074, 786467, 0, 196609, 852001, 0, 131072, 852003, 0, 196609, 917537, 0, 131074, 917539, 0, 196609, 983073, 0, 131073, 983075, 0, 196609, 1048594, 1, 0, 1048609, 0, 131072, 1048611, 0, 196609, 1114130, 1, 0, 1179666, 1, 0, 1245202, 1, 0, 1310738, 1, 0, 1376274, 1, 0, 1441810, 1, 0, 1507346, 1, 0 )
+
+[node name="Mushroom" parent="." instance=ExtResource( 8 )]
+position = Vector2( 248, 128 )
