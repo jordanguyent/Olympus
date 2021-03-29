@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Levels/Level1/Assets/TMBlocks.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=2]
@@ -6,9 +6,14 @@
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Levels/Level1/Assets/TMDanger.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Levels/Level1/Assets/Mushroom.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Levels/Level1/Background/Background03.png" type="Texture" id=7]
 
 [node name="Stage3" type="Node2D"]
 script = ExtResource( 3 )
+
+[node name="Background03" type="Sprite" parent="."]
+position = Vector2( 120, 112 )
+texture = ExtResource( 7 )
 
 [node name="TMBackground" parent="." instance=ExtResource( 2 )]
 
