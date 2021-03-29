@@ -7,6 +7,7 @@ public class MushroomEffect : Area2D
 	// that we dont have to do the sketchy stuff in ready.
 	// Player
 	Player player = null;
+	AnimatedSprite animatedSprite = null;
 	
 	// Signals
 	[Signal] public delegate void area_entered();
@@ -24,9 +25,11 @@ public class MushroomEffect : Area2D
 	// 
 	public override void _Ready()
 	{
-		player = this.Owner.Owner.GetNode("Player") as Player;
+		player = this.Owner.Owner.GetNode<Player>("Player");
+		animatedSprite = this.Owner.GetNode<AnimatedSprite>("AnimatedSprite");
 		Connect("area_entered", this, "OnEffectboxAreaEntered"); // Ok connect
 		Connect("Bounce", player, "OnFixedBounceableAreaEntered"); // Ok connect
+		animatedSprite.Connect("animation_finished", this, "OnAnimationFinished");
 	}
 
 	// When the box detects a collision with something it will send itself a 
@@ -39,7 +42,13 @@ public class MushroomEffect : Area2D
 	private void OnEffectboxAreaEntered(object area)
 	{
 		GD.Print("Effectbox now emitting bounce signal!");
+		animatedSprite.Play("Bounce");
 		EmitSignal("Bounce");
+	}
+
+	private void OnAnimationFinished()
+	{
+		animatedSprite.Stop();
 	}
 }
 
