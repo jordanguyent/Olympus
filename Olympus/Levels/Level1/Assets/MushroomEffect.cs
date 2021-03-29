@@ -24,7 +24,7 @@ public class MushroomEffect : Area2D
 	// 
 	public override void _Ready()
 	{
-		player = this.Owner.Owner.GetChildren()[2] as Player;
+		player = this.Owner.Owner.GetNode("Player") as Player;
 		Connect("area_entered", this, "OnEffectboxAreaEntered"); // Ok connect
 		Connect("Bounce", player, "OnFixedBounceableAreaEntered"); // Ok connect
 	}
