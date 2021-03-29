@@ -50,7 +50,6 @@ public class Player : KinematicBody2D
 
 	// Signals
 	[Signal] public delegate void PlayerDeath();
-	[Signal] public delegate void area_entered_bounce();
 
 	// World Movement Constants
 	[Export] int MAXSPEEDX = 100;
@@ -401,17 +400,25 @@ public class Player : KinematicBody2D
 			// wall to be considered climbing.
 			if (isClimbing && IsOnWall() && userInput.x == lastCollisionDirectionX)
 			{
+				// if the player is ONLY pressed up against the wall dont fall.
+				if (userInput.y == 0)
+				{
+					velocity.y = 0;
+				}
+				// If the player is holding a direction they want to climb and 
+				// are moving faster than they should while climbing then we 
+				// set their speed to MAXCLIMBSPEED. One of the few times we do
+				// not keep momentum.
+				else if (velocity.y > MAXCLIMBSPEED || velocity.y < -MAXCLIMBSPEED)
+				{
+					velocity.y = Math.Sign(velocity.y) * MAXCLIMBSPEED;
+				}
 				// Player is pressed up against the wall and holding up/down
 				// begin accelerating in that direction. We apply an extra -
 				// sign so that the up direction is negative as it should be.
-				if (userInput.y != 0)
+				else //if (userInput.y != 0)
 				{
 					velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * MAXCLIMBSPEED, delta * CLIMBACCELERATION);
-				}
-				// if the player is ONLY pressed up against the wall dont fall.
-				else if (userInput.y == 0)
-				{
-					velocity.y = 0;
 				}
 			}
 			// We want a "friction" like thing when player is on a wall, but 
@@ -585,6 +592,7 @@ public class Player : KinematicBody2D
 				}
 			}
 		}
+		// Climb
 		else
 		{
 			if (velocity.y != 0 && IsOnWall())
@@ -627,7 +635,6 @@ public class Player : KinematicBody2D
 		// will be freed and instance will not be able to access player
 		GetParent().AddChild(playerDeathEffect); 
 		playerDeathEffect.GlobalPosition = GlobalPosition;
-		// put camera here with position GLOBAL POSITION
 		QueueFree();
 	}
 	
@@ -646,7 +653,7 @@ public class Player : KinematicBody2D
 	// Returns
 	// -------
 	//
-	private void OnFixedBounceableAreaEntered(object area)
+	private void OnFixedBounceableAreaEntered()
 	{
 		// dont need to set jumpBufferFrames = 0 since it is unexpected that
 		// the player will touch the ground in 10 frames or less. If we really

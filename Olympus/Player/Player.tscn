@@ -1,10 +1,11 @@
-[gd_scene load_steps=38 format=2]
+[gd_scene load_steps=40 format=2]
 
 [ext_resource path="res://Player/Player.cs" type="Script" id=1]
 [ext_resource path="res://Sprites/PlayerSpriteSheet.png" type="Texture" id=2]
 [ext_resource path="res://Cameras/Follow.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Boxes/Hitbox.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Player/PlayerHurtbox.cs" type="Script" id=5]
+[ext_resource path="res://Boxes/Effectbox.tscn" type="PackedScene" id=6]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 2 )
@@ -127,7 +128,7 @@ animations = [ {
 }, {
 "frames": [ SubResource( 5 ), SubResource( 6 ), SubResource( 7 ), SubResource( 8 ) ],
 "loop": true,
-"name": "Climb",
+"name": "Jump1",
 "speed": 10.0
 }, {
 "frames": [ SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ) ],
@@ -165,6 +166,9 @@ extents = Vector2( 6, 10 )
 [sub_resource type="RectangleShape2D" id=32]
 extents = Vector2( 7, 7 )
 
+[sub_resource type="RectangleShape2D" id=33]
+extents = Vector2( 6, 10 )
+
 [node name="Player" type="KinematicBody2D"]
 collision_layer = 2147483650
 collision_mask = 2147483649
@@ -198,6 +202,15 @@ position = Vector2( 0, -2 )
 position = Vector2( 10, 0 )
 shape = SubResource( 32 )
 
+[node name="Effectbox(Detec)" parent="." instance=ExtResource( 6 )]
+collision_layer = 32
+
+[node name="CollisionShape2D" parent="Effectbox(Detec)" index="0"]
+position = Vector2( 0, -2 )
+shape = SubResource( 33 )
+
 [editable path="Hurtbox(Body)"]
 
 [editable path="AttackPivot/Hitbox(Attack)"]
+
+[editable path="Effectbox(Detec)"]
