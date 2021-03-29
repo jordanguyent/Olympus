@@ -13,8 +13,11 @@ script = ExtResource( 7 )
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
-[node name="Sprite" type="Sprite" parent="ParallaxBackground"]
-position = Vector2( 208, 32 )
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.8, 1 )
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
+position = Vector2( 272, 144 )
 texture = ExtResource( 6 )
 
 [node name="TMBackground" parent="." instance=ExtResource( 5 )]

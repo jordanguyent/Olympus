@@ -4,7 +4,7 @@ using System;
 public class PlantProjectile : KinematicBody2D
 {
 	// Constants
-	[Export] private int MAXSPEED = 250;
+	[Export] private int MAXSPEED = 200;
 	
 	// Variables
 	private Vector2 velocity = new Vector2(0,0);
