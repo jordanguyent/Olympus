@@ -55,8 +55,8 @@ public class Player : KinematicBody2D
 	[Export] int MAXSPEEDX = 100;
 	[Export] int MAXSPEEDY = 300;
 	[Export] int ACCELERATION = 1000;
-	[Export] int GRAVITY = 1450;
-	[Export] int JUMPSPEED = -205;
+	[Export] int GRAVITY = 1250;
+	[Export] int JUMPSPEED = -180;
 	[Export] int ONWALLFALLSPEED = 100;
 	[Export] int MAXCLIMBSPEED = 80;
 	[Export] int CLIMBACCELERATION = 500;
@@ -659,7 +659,7 @@ public class Player : KinematicBody2D
 		// the player will touch the ground in 10 frames or less. If we really
 		// wanted to do it, we could need another conditional expression or
 		// statement to do this here.
-		velocity.y = (jumpBufferFrames > 0) ? -500 : -400;
+		velocity.y = (jumpBufferFrames > 0) ? -425 : -345;
 	}
 	
 	// Signal - since the player only has one HP (health point) then whenever
