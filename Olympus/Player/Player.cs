@@ -45,6 +45,8 @@ using System;
 // 
 public class Player : KinematicBody2D
 {
+	
+	// 
 	// Base world node
 	World baseWorld = null;
 
@@ -82,17 +84,22 @@ public class Player : KinematicBody2D
 	private Vector2 velocity = new Vector2(0,0);
 	private Vector2 userInput = new Vector2(0,0);
 	private bool isDead = false;
+	private bool isConnected = false;
 	private bool lastOnFloor = false;
 	private bool justPressedJump = false;
 	private bool isFastFalling = false;
 	private bool isDashing = false;
 	private bool wasOnWall = false;
 	private bool isClimbing = false;
+	private bool previousIsOnFloor = false;
+	private bool isMoving = false;
+	private bool previousIsMoving = false;
 	private float wallFrictionFactor = 1;
 	private float jumpStrength = 0;
+	private int lastFacingDirection = 1;
+	private int previousLastFacingDirection = 1;
 	private int lastCollisionDirectionX = 1;
 	private int lastCollisionDirectionY = 1;
-	private int lastFacingDirection = 1;
 	private int frameLockX = 0;
 	private int frameLockY = 0;
 	private int dashLock = 0;
@@ -105,9 +112,12 @@ public class Player : KinematicBody2D
 	
 	// Animation Variables
 	private AnimatedSprite playerAnimation;
+	
+	// Effect Variables
+	private PackedScene smokeEffect0 = null;
+	private PackedScene smokeEffect1 = null;
+	
 
-	// [TODO] Try animationTree and Player since it provides more functionality. 
-	// Try both methods, see what works best
 	
 	// Called when the node enters the scene tree for the first time.
 	// Called when the node enters the scene tree for the first time. Used to
@@ -134,6 +144,10 @@ public class Player : KinematicBody2D
 		// methods.
 		playerAnimation = GetNode<AnimatedSprite>("AnimatedSprite");
 		playerAnimation.Play("Idle");
+		
+		// Loading Scenes
+		smokeEffect0 = GD.Load<PackedScene>("res://Effects/SmokeParticle.tscn");
+		smokeEffect1 = GD.Load<PackedScene>("res://Effects/SmokeParticle2.tscn");
 	}
 
 	// Obtains information about user input and uses information to calculate
@@ -184,13 +198,27 @@ public class Player : KinematicBody2D
 		// function IsOnFloor to work properly. Move and slide already takes
 		// delta into account. 
 		velocity = MoveAndSlide(velocity, -1 * E2);
-
+		
+		if (velocity != Vector2.Zero)
+		{
+			isConnected = true;
+		}
 		// Plays correct animation
 		PlayAnimation();
 		
+		// Plays player effects
+		if (isConnected)
+		{
+			PlayEffects();
+		}
 		// Snaps the position of Player to nearest pixel
 		// Removes jittering of pixels
 		Position = Position.Snapped(Vector2.One);
+		
+		// Store previous values
+		previousIsMoving = isMoving;
+		previousLastFacingDirection = lastFacingDirection;
+		previousIsOnFloor = IsOnFloor();
 	}
 
 	// Supposed to record the inputs from the user at the start of each fram so
@@ -213,6 +241,16 @@ public class Player : KinematicBody2D
 
 		// Update last facing direction accordingly
 		lastFacingDirection = (userInput.x == 0) ? lastFacingDirection : Math.Sign(userInput.x);
+		
+		// Cheks if player is moving
+		if (velocity != Vector2.Zero)
+		{
+			isMoving = true;
+		} 
+		else
+		{
+			isMoving = false;
+		}
 		
 		// Dashing is implemented here.
 		if (dashLock == 0)
@@ -636,6 +674,42 @@ public class Player : KinematicBody2D
 		GetParent().AddChild(playerDeathEffect); 
 		playerDeathEffect.GlobalPosition = GlobalPosition;
 		QueueFree();
+	}
+	
+	// Plays all effects related to the player
+	//
+	// Parameters 
+	// ----------
+	//
+	// Returns
+	// -------
+	//
+	private void PlayEffects()
+	{
+		if (IsOnFloor())
+		{
+			// Creates particle when player switches direction on floor
+			if (previousLastFacingDirection != lastFacingDirection || (previousIsMoving != isMoving && isMoving))
+			{
+				SmokeParticle SmokeEffect = (SmokeParticle)smokeEffect1.Instance();
+				if (lastFacingDirection == 1)
+					SmokeEffect.GlobalPosition = GlobalPosition + new Vector2(-3, 5);
+				else if (lastFacingDirection == -1)
+					SmokeEffect.GlobalPosition = GlobalPosition + new Vector2(3, 5);
+				SmokeEffect.FlipH = playerAnimation.FlipH;
+				GetParent().AddChild(SmokeEffect);
+			}
+			
+			// Creates particle when player lands on floor
+			if (previousIsOnFloor != IsOnFloor())
+			{
+				SmokeParticle SmokeEffect = (SmokeParticle)smokeEffect0.Instance();
+				SmokeEffect.GlobalPosition = GlobalPosition + new Vector2(0, 5);
+				GetParent().AddChild(SmokeEffect);
+			}
+		}
+		
+		
 	}
 	
 	// =============================== Signals ===============================

@@ -31,7 +31,7 @@ public class MushroomEffect : Area2D
 		Connect("Bounce", player, "OnFixedBounceableAreaEntered"); // Ok connect
 		animatedSprite.Connect("animation_finished", this, "OnAnimationFinished");
 	}
-
+	
 	// When the box detects a collision with something it will send itself a 
 	// signal to emit another signal to the player making them bounce. I had a
 	// lot of trouble getting it done any other way.
