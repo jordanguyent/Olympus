@@ -4,7 +4,7 @@ using System;
 public class Follow : Camera2D
 {
 	// Camera Constants
-	private float STANDARDSCALE = 1.25f;
+	private float STANDARDSCALE = 1.00f;
 	private int STANDARDLIMIT = 10000000;
 	// limits here for boundaries
 	
