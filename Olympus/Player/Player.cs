@@ -37,6 +37,7 @@ using System;
 // private float HelperMoveToward(float current, float desire, float acceleration)
 // private void PlayAnimation()
 // private void PlayDeathAnimation()
+// private void PlayEffect()
 // 
 // private void OnClimbableAreaEntered(object area)
 // private void OnClimbableAreaExited(object area)
@@ -198,19 +199,22 @@ public class Player : KinematicBody2D
 		// function IsOnFloor to work properly. Move and slide already takes
 		// delta into account. 
 		velocity = MoveAndSlide(velocity, -1 * E2);
+
+		// Plays correct animation
+		PlayAnimation();
 		
+		// Checks if Player has moved initially from scene loading
 		if (velocity != Vector2.Zero)
 		{
 			isConnected = true;
 		}
-		// Plays correct animation
-		PlayAnimation();
-		
+
 		// Plays player effects
 		if (isConnected)
 		{
 			PlayEffects();
 		}
+		
 		// Snaps the position of Player to nearest pixel
 		// Removes jittering of pixels
 		Position = Position.Snapped(Vector2.One);
