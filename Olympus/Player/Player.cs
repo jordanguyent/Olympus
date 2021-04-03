@@ -134,7 +134,6 @@ public class Player : KinematicBody2D
 	{ 
 		// Setting up signals
 		baseWorld = this.Owner as World;
-		GD.Print(this.Owner.GetType());
 		if(baseWorld == null)
 		{
 			throw new ArgumentNullException("Edwin: World is not found");
@@ -174,7 +173,7 @@ public class Player : KinematicBody2D
 				EmitSignal("PlayerDeath");
 				// this bool begins death animation
 				isDead = true;
-			}
+			} 
 			if ((collidedWith as TMClimable) != null)
 			{
 				isClimbing = true;
