@@ -17,7 +17,13 @@ _global_script_class_icons={
 
 config/name="Olympus"
 run/main_scene="res://Levels/World.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Olympus"
 config/icon="res://icon.png"
+
+[autoload]
+
+SceneHandler="*res://Levels/SceneHandler.cs"
 
 [display]
 

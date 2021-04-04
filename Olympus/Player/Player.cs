@@ -138,7 +138,6 @@ public class Player : KinematicBody2D
 		{
 			throw new ArgumentNullException("Edwin: World is not found");
 		}
-		Connect("PlayerDeath", baseWorld, "HandlePlayerDeath");
 
 		// Retrieves the Player's AnimatedSprite node in order to call its 
 		// methods.
@@ -170,7 +169,6 @@ public class Player : KinematicBody2D
 			Godot.Object collidedWith = currentCollision.Collider;
 			if ((collidedWith as TMDanger) != null)
 			{
-				EmitSignal("PlayerDeath");
 				// this bool begins death animation
 				isDead = true;
 			}
