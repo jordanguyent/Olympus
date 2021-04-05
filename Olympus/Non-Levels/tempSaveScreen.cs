@@ -76,11 +76,11 @@ public class tempSaveScreen : MarginContainer
                 SaveFileDescList[i].Text += $" - Empty Save";
             }else{
                 string SavePath = $"user://save{SaveNum}.json";
-                File LoadDefaultData = new Godot.File();
-                //LoadDefaultData.OpenEncryptedWithPass(SavePath, Godot.File.ModeFlags.Read, Password);
-                LoadDefaultData.Open(SavePath, Godot.File.ModeFlags.Read);
-                var DefaultList = new Godot.Collections.Dictionary<string, object>( (Godot.Collections.Dictionary)JSON.Parse(LoadDefaultData.GetLine()).Result );
-                LoadDefaultData.Close();
+                File LoadSaveData = new Godot.File();
+                //LoadSaveData.OpenEncryptedWithPass(SavePath, Godot.File.ModeFlags.Read, Password);
+                LoadSaveData.Open(SavePath, Godot.File.ModeFlags.Read);
+                var DefaultList = new Godot.Collections.Dictionary<string, object>( (Godot.Collections.Dictionary)JSON.Parse(LoadSaveData.GetLine()).Result );
+                LoadSaveData.Close();
 
                 Godot.Collections.Array StageData = (Godot.Collections.Array)DefaultList["WorldData"];
                 SaveFileDescList[i].Text += $" - Stage {StageData[0]}-{StageData[1]}";
