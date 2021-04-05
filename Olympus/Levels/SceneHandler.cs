@@ -45,6 +45,7 @@ public class SceneHandler : Node
             var SaveData = new Godot.Collections.Dictionary<string, object>( (Godot.Collections.Dictionary)JSON.Parse(LoadSaveFile.GetLine()).Result );
             LoadSaveFile.Close();
             //Modifying the data
+            CurrentStage = int.Parse(NextLevel);
             Godot.Collections.Array temp = new Godot.Collections.Array(){CurrentLevel, int.Parse(NextLevel)};
             SaveData["WorldData"] = temp; 
             //Overwrites save data - alternatively we can just save if the user presses exit from a menu
