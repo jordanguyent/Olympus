@@ -725,13 +725,16 @@ public class Player : KinematicBody2D
 	// Returns
 	// -------
 	//
-	private void OnFixedBounceableAreaEntered()
+	private void OnFixedBounceableAreaEntered(float theta)
 	{
 		// dont need to set jumpBufferFrames = 0 since it is unexpected that
 		// the player will touch the ground in 10 frames or less. If we really
 		// wanted to do it, we could need another conditional expression or
 		// statement to do this here.
-		velocity.y = (jumpBufferFrames > 0) ? -425 : -345;
+		velocity.x = 345 * (float)-Math.Cos(theta);
+		velocity.y = 345 * (float)-Math.Sin(theta);
+		velocity *= (jumpBufferFrames > 0) ? 1.25f : 1.0f;
+		// velocity.y = (jumpBufferFrames > 0) ? -425 : -345;
 	}
 	
 	// Signal - since the player only has one HP (health point) then whenever

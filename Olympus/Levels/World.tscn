@@ -43,3 +43,7 @@ position = Vector2( 432, 128 )
 
 [node name="Mushroom" parent="." instance=ExtResource( 8 )]
 position = Vector2( 248, 128 )
+
+[node name="Mushroom4" parent="." instance=ExtResource( 8 )]
+position = Vector2( 64.5, 139 )
+rotation = 0.785398
