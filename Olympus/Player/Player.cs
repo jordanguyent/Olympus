@@ -38,15 +38,11 @@ using System;
 // private void PlayAnimation()
 // private void PlayDeathAnimation()
 // 
-// private void OnClimbableAreaEntered(object area)
-// private void OnClimbableAreaExited(object area)
 // private void OnFixedBounceableAreaEntered(object area)
 // private void OnHurtboxBodyAreaEntered(object area)
 // 
 public class Player : KinematicBody2D
 {
-	
-	// 
 	// Base world node
 	World baseWorld = null;
 
@@ -117,7 +113,7 @@ public class Player : KinematicBody2D
 	private PackedScene smokeEffect0 = null;
 	private PackedScene smokeEffect1 = null;
 	
-
+	
 	
 	// Called when the node enters the scene tree for the first time.
 	// Called when the node enters the scene tree for the first time. Used to
@@ -172,14 +168,6 @@ public class Player : KinematicBody2D
 				// this bool begins death animation
 				isDead = true;
 			}
-			if ((collidedWith as TMClimable) != null)
-			{
-				isClimbing = true;
-			} 
-			else
-			{
-				isClimbing = false;
-			}
 		}
 
 		// Update player based on user inputs so we may make calculations
@@ -233,10 +221,14 @@ public class Player : KinematicBody2D
 		// Freeze user inputs to be this for the rest of the calculations as it
 		// is possible for these values to change between lines of code and 
 		// result in inconcistencies in code. 
+		// NOTE: We dont freeze bools for IsOnWall, IsOnFloor, IsOnCeiling, etc
+		// since these are updated only on call of MoveAndSlide() which only
+		// happence once every frame anyways.
 		userInput.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
 		userInput.y = Input.GetActionStrength("ui_up") - Input.GetActionStrength("ui_down");
 		jumpStrength = Input.GetActionStrength("ui_jump");
-
+		isClimbing = (Input.GetActionStrength("ui_grab") > 0) && IsOnWall();
+		
 		// Update last facing direction accordingly
 		lastFacingDirection = (userInput.x == 0) ? lastFacingDirection : Math.Sign(userInput.x);
 		
@@ -424,43 +416,35 @@ public class Player : KinematicBody2D
 		// not counter his velocity during a wall jump. 
 		if (frameLockY == 0)
 		{
-			// Calculate the wall friction factor so that we may have smooth
-			// player movement when falling/sliding/moving on walls. Since 
-			// WALLFRICTIONFACTOR is so small, the player is allowed to stay
-			// on a wall for a while before begining to slide down. This is an
-			// accidental feature, but a good one to have :)
-			wallFrictionFactor = (velocity.y > ONWALLFALLSPEED) ? 1.5f : WALLFRICTIONFACTOR;
-
 			// Implementation of climbing controls. Make sure that the player
 			// is in a climbing state, is on the wall, and pushing against the
 			// wall to be considered climbing.
-			if (isClimbing && IsOnWall() && userInput.x == lastCollisionDirectionX)
+			if (isClimbing && userInput.x == lastCollisionDirectionX)
 			{
-				// if the player is ONLY pressed up against the wall dont fall.
-				if (userInput.y == 0)
-				{
-					velocity.y = 0;
-				}
 				// If the player is holding a direction they want to climb and 
-				// are moving faster than they should while climbing then we 
-				// set their speed to MAXCLIMBSPEED. One of the few times we do
-				// not keep momentum.
-				else if (velocity.y > MAXCLIMBSPEED || velocity.y < -MAXCLIMBSPEED)
-				{
-					velocity.y = Math.Sign(velocity.y) * MAXCLIMBSPEED;
-				}
-				// Player is pressed up against the wall and holding up/down
-				// begin accelerating in that direction. We apply an extra -
-				// sign so that the up direction is negative as it should be.
-				else //if (userInput.y != 0)
-				{
-					velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * MAXCLIMBSPEED, delta * CLIMBACCELERATION);
-				}
+				// are moving faster than they should in that same direction, 
+				// they should quickly slow down to their intended speed ie keep
+				// momentum but slow down.
+				// NOTE: I just felt like 2.5 felt right. Ideally should be an
+				// exported variable but idk what to name it -Alexis
+				wallFrictionFactor = (velocity.y > MAXCLIMBSPEED || velocity.y < -MAXCLIMBSPEED) ? 2.5f : 1.0f;
+				// We apply an extra - sign so that the up direction is negative
+				// as it should be.
+				velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * MAXCLIMBSPEED, delta * CLIMBACCELERATION * wallFrictionFactor);
 			}
 			// We want a "friction" like thing when player is on a wall, but 
 			// only if he is already falling not when he is on the way up.
 			else if (IsOnWall() && velocity.y > 0)
 			{
+				// Calculate the wall friction factor so that we may have smooth
+				// player movement when falling/sliding/moving on walls. Since 
+				// WALLFRICTIONFACTOR is so small, the player is allowed to stay
+				// on a wall for a while before begining to slide down. This is an
+				// accidental feature, but a good one to have :)
+				// NOTE: I just felt like 1.5 felt right. Ideally should be an
+				// exported variable (like WALLFRICTIONFACTOR) but idk what to 
+				// name it -Alexis
+				wallFrictionFactor = (velocity.y > ONWALLFALLSPEED) ? 1.5f : WALLFRICTIONFACTOR;
 				velocity.y = HelperMoveToward(velocity.y, ONWALLFALLSPEED, delta * GRAVITY * wallFrictionFactor);
 			}
 			// If we are just in the air we want gravity to be applied until 
@@ -725,16 +709,27 @@ public class Player : KinematicBody2D
 	// Returns
 	// -------
 	//
-	private void OnFixedBounceableAreaEntered(float theta)
+	private void OnFixedBounceableAreaEntered(int degrees)
 	{
-		// dont need to set jumpBufferFrames = 0 since it is unexpected that
-		// the player will touch the ground in 10 frames or less. If we really
-		// wanted to do it, we could need another conditional expression or
-		// statement to do this here.
-		velocity.x = 345 * (float)-Math.Cos(theta);
-		velocity.y = 345 * (float)-Math.Sin(theta);
-		velocity *= (jumpBufferFrames > 0) ? 1.25f : 1.0f;
-		// velocity.y = (jumpBufferFrames > 0) ? -425 : -345;
+		// We want the player to be able to get a boost if they can press the 
+		// spacebar at a near time.
+		int magnitude = (jumpBufferFrames > 0) ? 425 : 345;
+		if (degrees == 90 || degrees == 270) // vertical
+		{
+			
+			velocity.y = -magnitude * Math.Sign(Math.Sin(degrees * Math.PI / 180));
+		}
+		else // horixontal
+		{
+			velocity.y = -150;
+			velocity.x = -magnitude * 1.15f * Math.Sign(Math.Cos(degrees * Math.PI / 180));
+		}
+		// Reset jump frames so that if the player is jumping into a mushroom, 
+		// it is able to be shot down from the mushroom. In addition, this will
+		// We also reset jumpBufferFrames since we want the player to be able to
+		// try again if they missed it.
+		jumpFrames = 0;
+		jumpBufferFrames = 0;
 	}
 	
 	// Signal - since the player only has one HP (health point) then whenever
@@ -751,6 +746,5 @@ public class Player : KinematicBody2D
 	{
 		isDead = true;
 	}
-	
 }
 

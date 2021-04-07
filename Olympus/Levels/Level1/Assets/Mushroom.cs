@@ -20,6 +20,8 @@ public class Mushroom : StaticBody2D
 	public override void _Ready()
 	{
 		effect = GetNode<MushroomEffect>("Effectbox");
-		effect.theta = (RotationDegrees + 90) * (float) Math.PI / 180;
+		// We must round since a float is not precise enough for int values like
+		// 45, 270, 90, 180, etc accurately.
+		effect.degrees = ((int) Math.Round(RotationDegrees) + 90);
 	}
 }

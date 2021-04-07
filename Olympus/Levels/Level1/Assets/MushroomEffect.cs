@@ -7,7 +7,7 @@ public class MushroomEffect : Area2D
 	private Player player = null;
 	private AnimatedSprite animatedSprite = null;
 	
-	public float theta = 0;
+	public int degrees = 0;
 	
 	// Signals
 	[Signal] public delegate void area_entered();
@@ -41,9 +41,8 @@ public class MushroomEffect : Area2D
 	// that we may use polymorphism to get around this.
 	private void OnEffectboxAreaEntered(object area)
 	{
-		GD.Print("Effectbox now emitting bounce signal!");
 		animatedSprite.Play("Bounce");
-		EmitSignal("Bounce", theta);
+		EmitSignal("Bounce", degrees);
 	}
 
 	private void OnAnimationFinished()
