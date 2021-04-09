@@ -3,11 +3,11 @@ using System;
 
 public class MushroomEffect : Area2D
 {
-	// [ TODO ] : make this reference the player directly using a directory so
-	// that we dont have to do the sketchy stuff in ready.
-	// Player
-	Player player = null;
-	AnimatedSprite animatedSprite = null;
+	// Variables
+	private Player player = null;
+	private AnimatedSprite animatedSprite = null;
+	
+	public int degrees = 0;
 	
 	// Signals
 	[Signal] public delegate void area_entered();
@@ -41,9 +41,8 @@ public class MushroomEffect : Area2D
 	// that we may use polymorphism to get around this.
 	private void OnEffectboxAreaEntered(object area)
 	{
-		GD.Print("Effectbox now emitting bounce signal!");
 		animatedSprite.Play("Bounce");
-		EmitSignal("Bounce");
+		EmitSignal("Bounce", degrees);
 	}
 
 	private void OnAnimationFinished()
