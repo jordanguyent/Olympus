@@ -30,7 +30,7 @@ animations = [ {
 } ]
 
 [sub_resource type="RectangleShape2D" id=6]
-extents = Vector2( 7, 4 )
+extents = Vector2( 8, 4 )
 
 [node name="Mushroom" type="StaticBody2D"]
 collision_mask = 0
@@ -45,7 +45,7 @@ collision_mask = 2147483680
 script = ExtResource( 3 )
 
 [node name="CollisionShape2D" parent="Effectbox" index="0"]
-position = Vector2( 0, 4 )
+position = Vector2( 0, 3 )
 shape = SubResource( 6 )
 
 [editable path="Effectbox"]

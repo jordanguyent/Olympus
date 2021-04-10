@@ -724,7 +724,7 @@ public class Player : KinematicBody2D
 		}
 		else // horixontal
 		{
-			velocity.y = -150;
+			velocity.y = -200;
 			velocity.x = -magnitude * 1.15f * Math.Sign(Math.Cos(degrees * Math.PI / 180));
 		}
 		// Reset jump frames so that if the player is jumping into a mushroom, 
