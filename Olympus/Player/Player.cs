@@ -56,10 +56,12 @@ public class Player : KinematicBody2D
 	[Export] int ACCELERATION = 1000;
 	[Export] int GRAVITY = 1250;
 	[Export] int JUMPSPEED = -180;
-	[Export] int ONWALLFALLSPEED = 100;
+	// [Export] int ONWALLFALLSPEED = 80;
 	[Export] int MAXCLIMBSPEED = 80;
-	[Export] int CLIMBACCELERATION = 500;
-	[Export] float WALLFRICTIONFACTOR = .01f;
+	[Export] float WALLFACTORJERK = 10.0f;
+	[Export] float LOWWALLFRICTIONFACTOR = .5f; // temp
+	[Export] float STDWALLFRICTIONFACTOR = 1.75f; // temp
+	[Export] float HIGHWALLFRICTIONFACTOR = 2.5f; // temp
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.4f;
 	[Export] int DEFAULTDASHCOUNT = 1;
@@ -231,6 +233,7 @@ public class Player : KinematicBody2D
 		userInput.y = Input.GetActionStrength("ui_up") - Input.GetActionStrength("ui_down");
 		jumpStrength = Input.GetActionStrength("ui_jump");
 		isClimbing = (Input.GetActionStrength("ui_grab") > 0) && IsOnWall();
+		// [ TODO ] use ray cast here instead of IsOnWall
 		
 		// Update last facing direction accordingly
 		lastFacingDirection = (userInput.x == 0) ? lastFacingDirection : Math.Sign(userInput.x);
@@ -422,39 +425,48 @@ public class Player : KinematicBody2D
 			// Implementation of climbing controls. Make sure that the player
 			// is in a climbing state, is on the wall, and pushing against the
 			// wall to be considered climbing.
-			if (isClimbing && userInput.x == lastCollisionDirectionX)
+			if (isClimbing) // use MAXCLIMBSPEED
 			{
-				// If the player is holding a direction they want to climb and 
-				// are moving faster than they should in that same direction, 
-				// they should quickly slow down to their intended speed ie keep
-				// momentum but slow down.
-				// NOTE: I just felt like 2.5 felt right. Ideally should be an
-				// exported variable but idk what to name it -Alexis
-				wallFrictionFactor = (velocity.y > MAXCLIMBSPEED || velocity.y < -MAXCLIMBSPEED) ? 2.5f : 1.0f;
-				// We apply an extra - sign so that the up direction is negative
-				// as it should be.
-				velocity.y = HelperMoveToward(velocity.y, -Math.Sign(userInput.y) * MAXCLIMBSPEED, delta * CLIMBACCELERATION * wallFrictionFactor);
+				// This is so that the player can move up and down without
+				// having to push against the wall every time. If the value is
+				// not 0, that means that we are either moving left or right,
+				// which will be auto handled by HelperUpdateVelocityX
+				velocity.x += lastCollisionDirectionX * 50; // USE RAYCAST
+				// If velocity.y of the player is opposite that of userInput.y,
+				// then we want the player to QUICKLY change direction to agree
+				// with userInputs so we have a high wall friction factor.
+				if (Math.Sign(velocity.y) == Math.Sign(userInput.y) || userInput.y == 0)
+				{
+					wallFrictionFactor = HIGHWALLFRICTIONFACTOR;
+				}
+				// Now we know that velocity.y and userInput.y are parallel, so
+				// if the the player is less than MAXCLIMBSPEED we want them to
+				// accelerate to that value as normal.
+				else if (Math.Abs(velocity.y) < MAXCLIMBSPEED)
+				{
+					wallFrictionFactor = HelperMoveToward(wallFrictionFactor, STDWALLFRICTIONFACTOR, delta * WALLFACTORJERK);
+				}
+				// Now we know that velocity.y and userInput.y are parallel and
+				// that the player is going faster than intended, so we want
+				// them to slowly lose momentum and get to the MAXCLIMBSPEED
+				else
+				{
+					wallFrictionFactor = LOWWALLFRICTIONFACTOR;
+				}
+				// We make wall acceleration proportional to GRAVITY since 
+				// increasing GRAVITY in other levels will hopefully auto adjust
+				// how the player moves on wall in a way that feels natural.
+				velocity.y = HelperMoveToward(velocity.y, -MAXCLIMBSPEED * userInput.y, delta * GRAVITY * wallFrictionFactor);
 			}
 			// We want a "friction" like thing when player is on a wall, but 
 			// only if he is already falling not when he is on the way up.
-			else if (IsOnWall() && velocity.y > 0)
+			else if (IsOnWall() && velocity.y > 0) // use ONWALLFALLSPEED
 			{
-				// Calculate the wall friction factor so that we may have smooth
-				// player movement when falling/sliding/moving on walls. Since 
-				// WALLFRICTIONFACTOR is so small, the player is allowed to stay
-				// on a wall for a while before begining to slide down. This is an
-				// accidental feature, but a good one to have :)
-				// NOTE: I just felt like 1.5 felt right. Ideally should be an
-				// exported variable (like WALLFRICTIONFACTOR) but idk what to 
-				// name it -Alexis
-				wallFrictionFactor = (velocity.y > ONWALLFALLSPEED) ? 1.5f : WALLFRICTIONFACTOR;
-				velocity.y = HelperMoveToward(velocity.y, ONWALLFALLSPEED, delta * GRAVITY * wallFrictionFactor);
+				velocity.y += .001f;
+				velocity.y = HelperMoveToward(velocity.y, MAXCLIMBSPEED, delta * GRAVITY * STDWALLFRICTIONFACTOR);
 			}
 			// If we are just in the air we want gravity to be applied until 
-			// the player reaches their terminal velocity, MAXSPEEDY. If the
-			// player is fast falling, fall factor is > 1 else 1. the player
-			// will also decelerate to MAXSPEEDY as fast as they accelerate
-			// to their fast fall speed (see HelperUpdatePlayerState)
+			// the player reaches their terminal velocity, MAXSPEEDY. 
 			else
 			{
 				velocity.y = HelperMoveToward(velocity.y, MAXSPEEDY, delta * GRAVITY);
