@@ -30,7 +30,7 @@ position = Vector2( 512, 120 )
 position = Vector2( 576, 120 )
 
 [node name="ZoneA" parent="." instance=ExtResource( 7 )]
-position = Vector2( -8, 136 )
+position = Vector2( -64, 136 )
 
 [node name="ZoneB" parent="." instance=ExtResource( 8 )]
-position = Vector2( 704, 72 )
+position = Vector2( 760, 72 )

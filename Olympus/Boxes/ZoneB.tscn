@@ -3,11 +3,10 @@
 [ext_resource path="res://Boxes/Zone_B.cs" type="Script" id=1]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 8, 64 )
+extents = Vector2( 64, 64 )
 
 [node name="ZoneB" type="Area2D"]
 script = ExtResource( 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( 2.18279e-11, 0 )
 shape = SubResource( 1 )

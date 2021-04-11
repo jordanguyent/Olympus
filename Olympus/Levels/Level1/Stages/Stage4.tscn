@@ -42,7 +42,7 @@ position = Vector2( 144, 112 )
 texture = ExtResource( 7 )
 
 [node name="ZoneA" parent="." instance=ExtResource( 9 )]
-position = Vector2( -8, 32 )
+position = Vector2( -64, 32 )
 
-[node name="ZoneB" parent="ZoneA" instance=ExtResource( 10 )]
-position = Vector2( 680, 328 )
+[node name="ZoneB" parent="." instance=ExtResource( 10 )]
+position = Vector2( 720, 360 )
