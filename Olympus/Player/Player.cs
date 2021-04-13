@@ -129,6 +129,18 @@ public class Player : KinematicBody2D
 	// 
 	public override void _Ready() 
 	{ 
+		//Getting player position
+		SceneHandler SCNHAND = (SceneHandler)GetNode("/root/SceneHandler");
+		if(SCNHAND == null){
+			throw new ArgumentNullException("Edwin: Autoload SceneHandler not found"); 
+		}
+		Godot.Collections.Array SHPos = SCNHAND.PlayerSpawnPosition;
+		if(SHPos == null){
+			//don't do anything just spawn regularly
+		}else{
+			//Vector2 temp = new Vector2((int)SHPos[0], (int)SHPos[1]);
+			this.SetPosition( new Vector2(Convert.ToInt32(SHPos[0]), Convert.ToInt32(SHPos[1])) );
+		}
 		// Setting up signals
 		baseWorld = this.Owner as World;
 		if(baseWorld == null)
