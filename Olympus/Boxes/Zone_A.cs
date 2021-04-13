@@ -10,7 +10,6 @@ public class Zone_A : Area2D
 	public override void _Ready()
 	{
 		SceneHandler SCNHAND = (SceneHandler)GetNode("/root/SceneHandler");
-		GD.Print(SCNHAND.GetType());
 		Connect("ZoneAEntered", SCNHAND, "ChangeStage");
 	}
 

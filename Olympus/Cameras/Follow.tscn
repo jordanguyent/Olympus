@@ -2,5 +2,6 @@
 
 [ext_resource path="res://Cameras/Follow.cs" type="Script" id=1]
 
-[node name="Camera2D" type="Camera2D"]
+[node name="Follow" type="Camera2D"]
+editor_draw_drag_margin = true
 script = ExtResource( 1 )
