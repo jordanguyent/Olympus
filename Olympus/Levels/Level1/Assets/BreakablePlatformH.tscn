@@ -1,0 +1,111 @@
+[gd_scene load_steps=21 format=2]
+
+[ext_resource path="res://Boxes/Effectbox.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Levels/Level1/Assets/BreakablePlatformEffect.cs" type="Script" id=2]
+[ext_resource path="res://Sprites/Level1/BreakBlockHSpriteSheet.png" type="Texture" id=3]
+
+[sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 3 )
+region = Rect2( 0, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 3 )
+region = Rect2( 528, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 3 )
+region = Rect2( 576, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 3 )
+region = Rect2( 624, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 3 )
+region = Rect2( 48, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 3 )
+region = Rect2( 96, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 3 )
+region = Rect2( 144, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 3 )
+region = Rect2( 192, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 3 )
+region = Rect2( 240, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 3 )
+region = Rect2( 288, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=11]
+atlas = ExtResource( 3 )
+region = Rect2( 336, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=12]
+atlas = ExtResource( 3 )
+region = Rect2( 384, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=13]
+atlas = ExtResource( 3 )
+region = Rect2( 432, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=14]
+atlas = ExtResource( 3 )
+region = Rect2( 480, 0, 48, 16 )
+
+[sub_resource type="SpriteFrames" id=15]
+animations = [ {
+"frames": [ SubResource( 1 ) ],
+"loop": false,
+"name": "Idle",
+"speed": 20.0
+}, {
+"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ) ],
+"loop": false,
+"name": "Respawning",
+"speed": 20.0
+}, {
+"frames": [ SubResource( 5 ), SubResource( 6 ), SubResource( 7 ), SubResource( 8 ), SubResource( 9 ) ],
+"loop": true,
+"name": "Breaking",
+"speed": 10.0
+}, {
+"frames": [ SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ) ],
+"loop": false,
+"name": "Broken",
+"speed": 20.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=16]
+extents = Vector2( 24, 4 )
+
+[sub_resource type="RectangleShape2D" id=17]
+extents = Vector2( 25, 5 )
+
+[node name="BreakablePlatformH" type="StaticBody2D"]
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( 24, 8 )
+frames = SubResource( 15 )
+animation = "Idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 24, 4 )
+shape = SubResource( 16 )
+
+[node name="Effectbox" parent="." instance=ExtResource( 1 )]
+collision_mask = 32
+script = ExtResource( 2 )
+
+[node name="CollisionShape2D" parent="Effectbox" index="0"]
+position = Vector2( 24, 4 )
+shape = SubResource( 17 )
+
+[editable path="Effectbox"]

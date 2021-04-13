@@ -1,10 +1,11 @@
-[gd_scene load_steps=253 format=2]
+[gd_scene load_steps=254 format=2]
 
 [ext_resource path="res://Sprites/Level1/GrassTileset.png" type="Texture" id=1]
 [ext_resource path="res://Sprites/Level1/DirtTileset.png" type="Texture" id=2]
 [ext_resource path="res://Sprites/Level1/StoneTileset.png" type="Texture" id=3]
 [ext_resource path="res://Sprites/Level1/Zeus1.png" type="Texture" id=4]
 [ext_resource path="res://Sprites/Level1/Platform.png" type="Texture" id=5]
+[ext_resource path="res://Levels/Level1/Assets/TMBlocks.cs" type="Script" id=6]
 
 [sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 0, 0, 8, 0, 8, 8, 0, 8 )
@@ -2346,3 +2347,4 @@ points = PoolVector2Array( 0, 0, 8, 0, 8, 8, 0, 8 )
 tile_set = SubResource( 247 )
 cell_size = Vector2( 8, 8 )
 format = 1
+script = ExtResource( 6 )

@@ -117,7 +117,6 @@ public class Player : KinematicBody2D
 	private PackedScene smokeEffect1 = null;
 	
 	
-	
 	// Called when the node enters the scene tree for the first time.
 	// Called when the node enters the scene tree for the first time. Used to
 	// connect signals from Player to its child nodes like Ball.
@@ -170,7 +169,27 @@ public class Player : KinematicBody2D
 				// this bool begins death animation
 				isDead = true;
 			}
+
+			// Checks player collision with specific tile in TileMap
+			// if ((collidedWith as TMBlocks) != null)
+			// {
+			// 	TileMap collidedWithTM = (TileMap) collidedWith;
+			// 	Vector2 tilePos = collidedWithTM.WorldToMap(Position);
+			// 	tilePos -= currentCollision.Normal;
+			// 	var tile = collidedWithTM.GetCellv(tilePos);
+			// 	// changes the tile
+			// 	if (tile > 0)
+			// 	{
+			// 		// GD.Print(tilePos);
+			// 		GD.Print(tile);
+			// 	}
+			// }
 		}
+
+		// if (totalCollisions != 0)
+		// {
+		// 	var tile_pos = 
+		// }
 
 		// Update player based on user inputs so we may make calculations
 		// about their movement consistently in the following functions.
@@ -587,11 +606,11 @@ public class Player : KinematicBody2D
 	private void PlayAnimation()
 	{
 		// determines where player faces
-		if (lastFacingDirection == -1)
+		if (lastFacingDirection == -1 && !IsOnWall())
 		{
 			playerAnimation.FlipH = true;
 		}
-		else if (lastFacingDirection == 1)
+		else if (lastFacingDirection == 1  && !IsOnWall())
 		{
 			playerAnimation.FlipH = false;
 		}
@@ -739,6 +758,7 @@ public class Player : KinematicBody2D
 			velocity.y = -200;
 			velocity.x = -magnitude * 1.15f * Math.Sign(Math.Cos(degrees * Math.PI / 180));
 		}
+
 		// Reset jump frames so that if the player is jumping into a mushroom, 
 		// it is able to be shot down from the mushroom. In addition, this will
 		// We also reset jumpBufferFrames since we want the player to be able to
