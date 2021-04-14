@@ -44,9 +44,16 @@ using System;
 // 
 public class Player : KinematicBody2D
 {
-	// Base world node
-	World baseWorld = null;
-
+	// Nodes
+	private World baseWorld = null;
+	private AnimatedSprite playerAnimation = null;
+	private RayCast2D climbRay = null;
+	private RayCast2D kickRay = null;
+	
+	// Effect Variables
+	private PackedScene smokeEffect0 = null;
+	private PackedScene smokeEffect1 = null;
+	
 	// Signals
 	[Signal] public delegate void PlayerDeath();
 
@@ -56,12 +63,11 @@ public class Player : KinematicBody2D
 	[Export] int ACCELERATION = 1000;
 	[Export] int GRAVITY = 1250;
 	[Export] int JUMPSPEED = -180;
-	// [Export] int ONWALLFALLSPEED = 80;
 	[Export] int MAXCLIMBSPEED = 80;
 	[Export] float WALLFACTORJERK = 10.0f;
-	[Export] float LOWWALLFRICTIONFACTOR = .5f; // temp
-	[Export] float STDWALLFRICTIONFACTOR = 1.75f; // temp
-	[Export] float HIGHWALLFRICTIONFACTOR = 2.5f; // temp
+	[Export] float LOWWALLFRICTIONFACTOR = .5f;
+	[Export] float STDWALLFRICTIONFACTOR = 1.75f;
+	[Export] float HIGHWALLFRICTIONFACTOR = 2.5f;
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.4f;
 	[Export] int DEFAULTDASHCOUNT = 1;
@@ -76,6 +82,7 @@ public class Player : KinematicBody2D
 	[Export] int DASHFRAMELOCK = 9;
 	[Export] int ATTACKFRAMELOCK = 10;
 	[Export] int WALLBUFFERMAX = 5;
+	[Export] int DASHRECHARGE = 5; // maybe have a visual indicator for this
 
 	// Object Constants
 	
@@ -90,6 +97,7 @@ public class Player : KinematicBody2D
 	private bool isDashing = false;
 	private bool wasOnWall = false;
 	private bool isClimbing = false;
+	private bool holdingGrab = false;
 	private bool previousIsOnFloor = false;
 	private bool isMoving = false;
 	private bool previousIsMoving = false;
@@ -102,6 +110,7 @@ public class Player : KinematicBody2D
 	private int frameLockX = 0;
 	private int frameLockY = 0;
 	private int dashLock = 0;
+	private int dashRecharge = 0;
 	private int attackLock = 0;
 	private int jumpFrames = 0;
 	private int jumpBufferFrames = 0;
@@ -109,12 +118,6 @@ public class Player : KinematicBody2D
 	private int dashCount = 0;
 	private int attackDirection = 3;
 	
-	// Animation Variables
-	private AnimatedSprite playerAnimation;
-	
-	// Effect Variables
-	private PackedScene smokeEffect0 = null;
-	private PackedScene smokeEffect1 = null;
 	
 	
 	// Called when the node enters the scene tree for the first time.
@@ -129,21 +132,25 @@ public class Player : KinematicBody2D
 	// 
 	public override void _Ready() 
 	{ 
-		//Getting player position
+		// Getting player position
 		SceneHandler SCNHAND = (SceneHandler)GetNode("/root/SceneHandler");
-		if(SCNHAND == null){
+		if (SCNHAND == null)
+		{
 			throw new ArgumentNullException("Edwin: Autoload SceneHandler not found"); 
 		}
 		Godot.Collections.Array SHPos = SCNHAND.PlayerSpawnPosition;
-		if(SHPos == null){
-			//don't do anything just spawn regularly
-		}else{
+		if (SHPos == null)
+		{
+			// don't do anything just spawn regularly
+		}
+		else
+		{
 			//Vector2 temp = new Vector2((int)SHPos[0], (int)SHPos[1]);
 			this.SetPosition( new Vector2(Convert.ToInt32(SHPos[0]), Convert.ToInt32(SHPos[1])) );
 		}
 		// Setting up signals
 		baseWorld = this.Owner as World;
-		if(baseWorld == null)
+		if (baseWorld == null)
 		{
 			throw new ArgumentNullException("Edwin: World is not found");
 		}
@@ -151,6 +158,8 @@ public class Player : KinematicBody2D
 		// Retrieves the Player's AnimatedSprite node in order to call its 
 		// methods.
 		playerAnimation = GetNode<AnimatedSprite>("AnimatedSprite");
+		climbRay = GetNode<RayCast2D>("ClimbRay");
+		kickRay  = GetNode<RayCast2D>("KickRay");
 		playerAnimation.Play("Idle");
 		
 		// Loading Scenes
@@ -181,27 +190,7 @@ public class Player : KinematicBody2D
 				// this bool begins death animation
 				isDead = true;
 			}
-
-			// Checks player collision with specific tile in TileMap
-			// if ((collidedWith as TMBlocks) != null)
-			// {
-			// 	TileMap collidedWithTM = (TileMap) collidedWith;
-			// 	Vector2 tilePos = collidedWithTM.WorldToMap(Position);
-			// 	tilePos -= currentCollision.Normal;
-			// 	var tile = collidedWithTM.GetCellv(tilePos);
-			// 	// changes the tile
-			// 	if (tile > 0)
-			// 	{
-			// 		// GD.Print(tilePos);
-			// 		GD.Print(tile);
-			// 	}
-			// }
 		}
-
-		// if (totalCollisions != 0)
-		// {
-		// 	var tile_pos = 
-		// }
 
 		// Update player based on user inputs so we may make calculations
 		// about their movement consistently in the following functions.
@@ -221,7 +210,9 @@ public class Player : KinematicBody2D
 		// Plays correct animation
 		PlayAnimation();
 		
-		// Checks if Player has moved initially from scene loading
+		// Checks if Player has moved initially from scene loading. This var is
+		// updated only once per player instance and necessary for playing
+		// effects.
 		if (velocity != Vector2.Zero)
 		{
 			isConnected = true;
@@ -233,8 +224,8 @@ public class Player : KinematicBody2D
 			PlayEffects();
 		}
 		
-		// Snaps the position of Player to nearest pixel
-		// Removes jittering of pixels
+		// Snaps the position of Player to nearest pixel Removes jittering of
+		// pixels
 		Position = Position.Snapped(Vector2.One);
 		
 		// Store previous values
@@ -263,21 +254,38 @@ public class Player : KinematicBody2D
 		userInput.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
 		userInput.y = Input.GetActionStrength("ui_up") - Input.GetActionStrength("ui_down");
 		jumpStrength = Input.GetActionStrength("ui_jump");
-		isClimbing = (Input.GetActionStrength("ui_grab") > 0) && IsOnWall();
-		// [ TODO ] use ray cast here instead of IsOnWall
+		holdingGrab = Input.GetActionStrength("ui_grab") > 0;
 		
-		// Update last facing direction accordingly
-		lastFacingDirection = (userInput.x == 0) ? lastFacingDirection : Math.Sign(userInput.x);
-		
-		// Cheks if player is moving
-		if (velocity != Vector2.Zero)
+		// Update last facing direction AND all RayCast2D accordingly
+		if (userInput.x != 0)
 		{
-			isMoving = true;
-		} 
-		else
-		{
-			isMoving = false;
+			lastFacingDirection = Math.Sign(userInput.x);
+			climbRay.RotationDegrees = (lastFacingDirection - 1) * 90;
+			kickRay.RotationDegrees = (lastFacingDirection - 1) * 90;
 		}
+		
+		// Determine if the player is in a climbing state
+		isClimbing = holdingGrab && climbRay.IsColliding();
+		
+		// Only turn on the kickRay when the player isClimbing, Only turn off
+		// kickRay when the player is not on the wall.
+		if (isClimbing)
+		{
+			kickRay.Enabled = true;
+		}
+		if (!IsOnWall())
+		{
+			kickRay.Enabled = false;
+		}
+		
+		if (!isClimbing && kickRay.IsColliding() && holdingGrab)
+		{
+			velocity.y = -150;
+			velocity.x = 150 * lastFacingDirection;
+		}
+		
+		// Checks if player is moving
+		isMoving = (velocity != Vector2.Zero);
 		
 		// Dashing is implemented here.
 		if (dashLock == 0)
@@ -291,9 +299,10 @@ public class Player : KinematicBody2D
 			{
 				isDashing = true;
 				dashCount--;
-				frameLockX = DASHFRAMELOCK;
-				frameLockY = DASHFRAMELOCK;
-				dashLock   = DASHFRAMELOCK;
+				frameLockX   = DASHFRAMELOCK;
+				frameLockY   = DASHFRAMELOCK;
+				dashLock     = DASHFRAMELOCK;
+				dashRecharge = DASHRECHARGE;
 				velocity.x = DASHSPEED * lastFacingDirection;
 				velocity.y = 0;
 				jumpFrames = 0;
@@ -302,10 +311,23 @@ public class Player : KinematicBody2D
 			{
 				isDashing = false;
 			}
-			// Dashes reset only when on the ground and player is not dashing.
-			if (IsOnFloor() && !isDashing)
+			// Dashes reset only when on ground for enough frames and player is
+			// not dashing.
+			if (IsOnFloor() && !isDashing && dashRecharge == 0)
 			{
-				dashCount = DEFAULTDASHCOUNT;
+				dashCount = DEFAULTDASHCOUNT; // do we get all or just one at a time?
+			}
+			// Dash counter counts only when the player is on the ground and not
+			// dashing
+			else if (IsOnFloor() && !isDashing && dashRecharge > 0)
+			{
+				dashRecharge--;
+			}
+			// reset frame counter since they need to be on ground continuously
+			// to regain dash
+			else if (!IsOnFloor() || isDashing)
+			{
+				dashRecharge = DASHRECHARGE;
 			}
 		}
 		else
