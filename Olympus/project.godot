@@ -25,6 +25,7 @@ config/icon="res://icon.png"
 
 SceneHandler="*res://Non-Levels/SceneHandler.cs"
 Pause="*res://Non-Levels/Pause.tscn"
+Config="*res://Non-Levels/Config.cs"
 
 [display]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Levels/World.cs" type="Script" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=2]
@@ -11,6 +11,8 @@
 [ext_resource path="res://Levels/Level1/Assets/BreakablePlatformV.tscn" type="PackedScene" id=9]
 [ext_resource path="res://Levels/Level1/Assets/Mushroom.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Levels/Level1/Assets/BreakablePlatformH.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Levels/Level1/Background/WoodsBackgroundHorizontal1.png" type="Texture" id=12]
+[ext_resource path="res://Levels/Level1/Background/WoodsBackgroundHorizontal2.png" type="Texture" id=13]
 
 [node name="Stage16" type="Node2D"]
 script = ExtResource( 1 )
@@ -65,3 +67,27 @@ position = Vector2( 1104, 368 )
 
 [node name="BreakablePlatformH5" parent="." instance=ExtResource( 11 )]
 position = Vector2( 904, 328 )
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.25, 1 )
+
+[node name="WoodsBackgroundHorizontal1" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
+position = Vector2( 592, 136 )
+texture = ExtResource( 12 )
+
+[node name="WoodsBackgroundHorizontal2" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
+position = Vector2( 1768, 136 )
+texture = ExtResource( 12 )
+
+[node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.5, 1 )
+
+[node name="WoodsBackgroundHorizontal3" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
+position = Vector2( 1688, 136 )
+texture = ExtResource( 13 )
+
+[node name="WoodsBackgroundHorizontal2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
+position = Vector2( 592, 136 )
+texture = ExtResource( 13 )

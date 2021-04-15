@@ -107,7 +107,7 @@ public class SceneHandler : Node
 		// //TODO: Deal with gameplay options here - this is a stub
 		// //TODO: Deal with player unlocked abilities here - this is a stub
 		// This is already opened so don't close it since we're not done with it
-		EmitSignal(SaveFile)
+//		EmitSignal(SaveFile);
 
 		string CurrentStageScenePath = $"res://Levels/Level{this.CurrentLevel}/Stages/Stage{this.CurrentStage}.tscn";
 		SceneHelper(CurrentStageScenePath);

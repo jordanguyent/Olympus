@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Levels/World.cs" type="Script" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMBlocks.tscn" type="PackedScene" id=2]
@@ -8,6 +8,9 @@
 [ext_resource path="res://Levels/Level1/Assets/Mushroom.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Boxes/ZoneA.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Boxes/ZoneB.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Levels/Level1/Background/BigCaveBackground1.png" type="Texture" id=9]
+[ext_resource path="res://Levels/Level1/Background/CaveBackground3.png" type="Texture" id=10]
+[ext_resource path="res://Levels/Level1/Background/CaveBackground2.png" type="Texture" id=11]
 
 [node name="Stage13" type="Node2D"]
 script = ExtResource( 1 )
@@ -45,3 +48,25 @@ position = Vector2( -64, 160 )
 
 [node name="ZoneB" parent="." instance=ExtResource( 8 )]
 position = Vector2( 544, -96 )
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.25, 1 )
+
+[node name="BigCaveBackground1" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
+position = Vector2( 328, 144 )
+texture = ExtResource( 9 )
+
+[node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
+
+[node name="CaveBackground2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
+position = Vector2( 256, -24 )
+texture = ExtResource( 11 )
+
+[node name="ParallaxLayer3" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.5, 1 )
+
+[node name="CaveBackground3" type="Sprite" parent="ParallaxBackground/ParallaxLayer3"]
+position = Vector2( 296, 128 )
+texture = ExtResource( 10 )
