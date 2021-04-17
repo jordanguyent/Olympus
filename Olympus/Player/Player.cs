@@ -278,10 +278,18 @@ public class Player : KinematicBody2D
 			kickRay.Enabled = false;
 		}
 		
+		// If we are climbing onto a ledge we take control of the player by
+		// setting framelocks and manually setting velocity x and velocity y.
+		// it is OK to use lastFacingDirection in this situation since it is
+		// simpler than using RayCast2D RotationDegrees and because the player
+		// must have been colliding with the wall anyways to be climbing.
 		if (!isClimbing && kickRay.IsColliding() && holdingGrab)
 		{
-			velocity.y = -150;
+			velocity.y = -100;
 			velocity.x = 150 * lastFacingDirection;
+			frameLockX = 1;
+			frameLockY = 1;
+			dashLock = 1;
 		}
 		
 		// Checks if player is moving
@@ -319,15 +327,9 @@ public class Player : KinematicBody2D
 			}
 			// Dash counter counts only when the player is on the ground and not
 			// dashing
-			else if (IsOnFloor() && !isDashing && dashRecharge > 0)
+			else if (!isDashing && dashRecharge > 0)
 			{
 				dashRecharge--;
-			}
-			// reset frame counter since they need to be on ground continuously
-			// to regain dash
-			else if (!IsOnFloor() || isDashing)
-			{
-				dashRecharge = DASHRECHARGE;
 			}
 		}
 		else
@@ -478,13 +480,17 @@ public class Player : KinematicBody2D
 			// Implementation of climbing controls. Make sure that the player
 			// is in a climbing state, is on the wall, and pushing against the
 			// wall to be considered climbing.
-			if (isClimbing) // use MAXCLIMBSPEED
+			if (isClimbing)
 			{
 				// This is so that the player can move up and down without
 				// having to push against the wall every time. If the value is
 				// not 0, that means that we are either moving left or right,
-				// which will be auto handled by HelperUpdateVelocityX
-				velocity.x += lastCollisionDirectionX * 50; // USE RAYCAST
+				// which will be auto handled by HelperUpdateVelocityX. We use
+				// climbRay.RotationDegrees since it is more accurate than 
+				// last collision detection because climbRay updates BEFORE the
+				// player's lastCollisionDetection because it sticks out one
+				// pixel from the player.
+				velocity.x += (float)Math.Cos(climbRay.RotationDegrees * Math.PI / 180) * 50;
 				// If velocity.y of the player is opposite that of userInput.y,
 				// then we want the player to QUICKLY change direction to agree
 				// with userInputs so we have a high wall friction factor.
@@ -513,7 +519,7 @@ public class Player : KinematicBody2D
 			}
 			// We want a "friction" like thing when player is on a wall, but 
 			// only if he is already falling not when he is on the way up.
-			else if (IsOnWall() && velocity.y > 0) // use ONWALLFALLSPEED
+			else if (IsOnWall() && velocity.y > 0)
 			{
 				velocity.y += .001f;
 				velocity.y = HelperMoveToward(velocity.y, MAXCLIMBSPEED, delta * GRAVITY * STDWALLFRICTIONFACTOR);
