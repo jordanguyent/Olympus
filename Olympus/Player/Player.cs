@@ -71,20 +71,31 @@ public class Player : KinematicBody2D
 	[Export] float WALLJUMPFACTORX = 1.4f;
 	[Export] float WALLJUMPFACTORY = 1.4f;
 	[Export] int DEFAULTDASHCOUNT = 1;
+	[Export] int DEFAULTJUMPCOUNT = 1;
 	[Export] int DASHSPEED = 310;
 	private Vector2 E1 = new Vector2(1, 0);
 	private Vector2 E2 = new Vector2(0, 1);
 
 	// Frame Data Constants
-	[Export] int MAXJUMPFRAME = 10;
 	[Export] int FRAMELOCKXY = 5;
-	[Export] int INPUTBUFFERMAX = 5;
 	[Export] int DASHFRAMELOCK = 9;
+	[Export] int DASHRECHARGE = 5;
 	[Export] int ATTACKFRAMELOCK = 10;
+	[Export] int MAXJUMPFRAME = 10;
+	[Export] int INPUTBUFFERMAX = 5;
 	[Export] int WALLBUFFERMAX = 5;
-	[Export] int DASHRECHARGE = 5; // maybe have a visual indicator for this
+	[Export] int COYOTEFRAMES = 5;
 
-	// Object Constants
+	// Frame Data Variables
+	private int frameLockX = 0;
+	private int frameLockY = 0;
+	private int dashLock = 0;
+	private int dashRecharge = 0;
+	private int attackLock = 0;
+	private int jumpFrames = 0;
+	private int jumpBufferFrames = 0;
+	private int wallBufferFrames = 0;
+	private int coyoteFrames = 0;
 	
 	// Player Movement Variables
 	private Vector2 velocity = new Vector2(0,0);
@@ -107,15 +118,8 @@ public class Player : KinematicBody2D
 	private int previousLastFacingDirection = 1;
 	private int lastCollisionDirectionX = 1;
 	private int lastCollisionDirectionY = 1;
-	private int frameLockX = 0;
-	private int frameLockY = 0;
-	private int dashLock = 0;
-	private int dashRecharge = 0;
-	private int attackLock = 0;
-	private int jumpFrames = 0;
-	private int jumpBufferFrames = 0;
-	private int wallBufferFrames = 0;
 	private int dashCount = 0;
+	private int jumpCount = 0;
 	private int attackDirection = 3;
 	
 	
@@ -433,6 +437,22 @@ public class Player : KinematicBody2D
 		{
 			attackLock--;
 		}
+		
+		// count down coyoteFranes if nonzero
+		if (coyoteFrames > 0)
+		{
+			coyoteFrames--;
+		}
+		
+		// initialize coyoteFrames we moved from being on the floor to being
+		// OFF the floor
+		if (IsOnFloor())
+		{
+			coyoteFrames = COYOTEFRAMES;
+			jumpCount = DEFAULTJUMPCOUNT;
+		}
+		
+		GD.Print(coyoteFrames);
 	}
 
 	// Calculates and updates velocity.x
@@ -521,7 +541,7 @@ public class Player : KinematicBody2D
 			// only if he is already falling not when he is on the way up.
 			else if (IsOnWall() && velocity.y > 0)
 			{
-				velocity.y += .001f;
+				velocity.y += .001f; // to prevent being still on the wall
 				velocity.y = HelperMoveToward(velocity.y, MAXCLIMBSPEED, delta * GRAVITY * STDWALLFRICTIONFACTOR);
 			}
 			// If we are just in the air we want gravity to be applied until 
@@ -564,12 +584,13 @@ public class Player : KinematicBody2D
 				// When player is on floor, just adjust velocity.y. jumpFrames
 				// set to MAXJUMPFRAME to enable variable height jump. Remember
 				// that the player was last on floor for the vairbale jump.
-				if (IsOnFloor())
+				if ((coyoteFrames > 0 && jumpCount > 0) || IsOnFloor())
 				{
 					velocity.y = JUMPSPEED;
 					jumpFrames = MAXJUMPFRAME;
 					lastOnFloor = true;
 					jumpBufferFrames = 0;
+					jumpCount--;
 				}
 				// When player is on wall, use direction of last collision to
 				// jump away from wall and update velocity vector. Set frame
