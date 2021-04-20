@@ -4,18 +4,21 @@ using System;
 public class BreakablePlatformEffect : Area2D
 {
 	// Variables
+	String currentAnimation = null;
 	[Export] int BDELAY = 100;
 	[Export] int SDELAY = 150;
-	int bTimer;
-	int sTimer;
-	CollisionShape2D collision = null;
-	bool inArea = false;
-	bool isBreaking = false;
-	bool isRespawning = false;
-	String currentAnimation = null;
+	private int bTimer;
+	private int sTimer;
+	
+	private bool inArea = false;
+	private bool isBreaking = false;
+	private bool isRespawning = false;
+
+	private Vector2 spritePos;
 
 	// Objects
 	AnimatedSprite animatedSprite = null;
+	CollisionShape2D collision = null;
 	
 	// Signals
 	[Signal] public delegate void area_entered();
@@ -33,11 +36,18 @@ public class BreakablePlatformEffect : Area2D
 	// 
 	public override void _Ready()
 	{
+		// Initializes timer
 		bTimer = BDELAY;
 		sTimer = SDELAY;
-		collision = this.Owner.GetNode<CollisionShape2D>("CollisionShape2D");
-		animatedSprite = this.Owner.GetNode<AnimatedSprite>("AnimatedSprite");
 
+		// Retrieve node path
+		collision = Owner.GetNode<CollisionShape2D>("CollisionShape2D");
+		animatedSprite = Owner.GetNode<AnimatedSprite>("AnimatedSprite");
+
+		// Initialize position
+		spritePos = animatedSprite.Position;
+
+		// Connect signals
 		Connect("area_entered", this, "OnEffectboxAreaEntered");
 		Connect("area_exited", this, "OnEffectboxAreaExited");
 		animatedSprite.Connect("animation_finished", this, "OnAnimationFinished");
@@ -60,16 +70,19 @@ public class BreakablePlatformEffect : Area2D
 		if (isBreaking) 
 		{
 			bTimer--;
+			animatedSprite.Position = new Vector2(spritePos.x + (int) GD.RandRange(-1.5, 1.5),spritePos.y + (int) GD.RandRange(-1.5, 1.5));
 			animatedSprite.Play("Breaking");
+			GD.Print(animatedSprite.Position);
 		}
 
 		// Block is Falling and Broken. Block goes into respawning state.
 		if (bTimer <= 0 && sTimer > 0)
 		{
+			sTimer--;
 			isBreaking = false;
 			isRespawning = true;
 			collision.Disabled = true;
-			sTimer--;
+			animatedSprite.Position = spritePos;
 			animatedSprite.Play("Broken");
 		}
 
@@ -86,23 +99,8 @@ public class BreakablePlatformEffect : Area2D
 
 		currentAnimation = animatedSprite.Animation;
 	}
-
-	// When the box detects a collision with something it will send itself a 
-	// signal to emit another signal to the player making them bounce. I had a
-	// lot of trouble getting it done any other way.
-	//
-	// Issues: What if we want mobile enemies to interact with the mushroom?
-	// Solution: We need all enemies to inherit from the same "enemy" node so
-	// that we may use polymorphism to get around this.
 	
-	
-	// When the box detects a collision with something it will send itself a 
-	// signal to emit another signal to the player making them bounce. I had a
-	// lot of trouble getting it done any other way.
-	//
-	// Issues: What if we want mobile enemies to interact with the mushroom?
-	// Solution: We need all enemies to inherit from the same "enemy" node so
-	// that we may use polymorphism to get around this.
+	// When player enters the hitbox, the block starts to break
 	private void OnEffectboxAreaEntered(object area)
 	{
 		// Block goes into breaking state
