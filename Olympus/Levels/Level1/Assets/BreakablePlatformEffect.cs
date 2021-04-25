@@ -72,7 +72,6 @@ public class BreakablePlatformEffect : Area2D
 			bTimer--;
 			animatedSprite.Position = new Vector2(spritePos.x + (int) GD.RandRange(-1.5, 1.5),spritePos.y + (int) GD.RandRange(-1.5, 1.5));
 			animatedSprite.Play("Breaking");
-			GD.Print(animatedSprite.Position);
 		}
 
 		// Block is Falling and Broken. Block goes into respawning state.

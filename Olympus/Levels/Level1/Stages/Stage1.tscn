@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=2]
@@ -6,6 +6,10 @@
 [ext_resource path="res://Levels/Level1/Assets/TMBlocks.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Levels/Level1/Background/SkyBackground1.png" type="Texture" id=5]
 [ext_resource path="res://Boxes/ZoneA.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Cameras/CameraChange.tscn" type="PackedScene" id=7]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 16, 40 )
 
 [node name="Stage1" type="Node2D"]
 script = ExtResource( 3 )
@@ -29,3 +33,21 @@ tile_data = PoolIntArray( -2, 0, 720896, -1, 0, 2, -65536, 0, 3, -65535, 0, 3, -
 
 [node name="ZoneA" parent="." instance=ExtResource( 6 )]
 position = Vector2( 464, 104 )
+
+[node name="CameraChange" parent="." instance=ExtResource( 7 )]
+position = Vector2( 8, 184 )
+state = 2
+
+[node name="CollisionShape2D" parent="CameraChange" index="0"]
+shape = SubResource( 1 )
+
+[node name="CameraChange2" parent="." instance=ExtResource( 7 )]
+position = Vector2( 384, 144 )
+state = 2
+
+[node name="CollisionShape2D" parent="CameraChange2" index="0"]
+shape = SubResource( 1 )
+
+[editable path="CameraChange"]
+
+[editable path="CameraChange2"]

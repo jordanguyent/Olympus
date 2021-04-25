@@ -121,8 +121,24 @@ public class Player : KinematicBody2D
 	private int dashCount = 0;
 	private int jumpCount = 0;
 	private int attackDirection = 3;
-	
-	
+
+	// Player State Variables
+	private PlayerState state = PlayerState.Idle;
+	// temp pos
+	private Vector2 deathPos;
+
+	// enums
+	enum PlayerState 
+	{
+		Idle,
+		Run,
+		Jump,
+		Climb,
+		WallSlide,
+		Dash,
+		Attack,
+		Death
+	}
 	
 	// Called when the node enters the scene tree for the first time.
 	// Called when the node enters the scene tree for the first time. Used to
@@ -143,14 +159,17 @@ public class Player : KinematicBody2D
 			throw new ArgumentNullException("Edwin: Autoload SceneHandler not found"); 
 		}
 		Godot.Collections.Array SHPos = SCNHAND.PlayerSpawnPosition;
+		Config CONFIG = (Config)GetNode("/root/Config");
+		SHPos = CONFIG.PlayerSpawnPosition;
 		if (SHPos == null)
 		{
 			// don't do anything just spawn regularly
+			GD.Print("NULL");
 		}
 		else
 		{
 			//Vector2 temp = new Vector2((int)SHPos[0], (int)SHPos[1]);
-			this.SetPosition( new Vector2(Convert.ToInt32(SHPos[0]), Convert.ToInt32(SHPos[1])) );
+			Position = new Vector2(Convert.ToInt32(SHPos[0]), Convert.ToInt32(SHPos[1]));
 		}
 		// Setting up signals
 		baseWorld = this.Owner as World;
@@ -170,7 +189,7 @@ public class Player : KinematicBody2D
 		smokeEffect0 = GD.Load<PackedScene>("res://Effects/SmokeParticle.tscn");
 		smokeEffect1 = GD.Load<PackedScene>("res://Effects/SmokeParticle2.tscn");
 	}
-
+	
 	// Obtains information about user input and uses information to calculate
 	// and update velocty as well as move the player in-game.
 	//
@@ -183,6 +202,7 @@ public class Player : KinematicBody2D
 	//   
 	public override void _PhysicsProcess(float delta)
 	{
+		
 		// Checking collisions
 		int totalCollisions = GetSlideCount();
 		for(int i = 0; i < totalCollisions; i++)
@@ -193,6 +213,7 @@ public class Player : KinematicBody2D
 			{
 				// this bool begins death animation
 				isDead = true;
+				deathPos = Position;
 			}
 		}
 
@@ -451,8 +472,6 @@ public class Player : KinematicBody2D
 			coyoteFrames = COYOTEFRAMES;
 			jumpCount = DEFAULTJUMPCOUNT;
 		}
-		
-		GD.Print(coyoteFrames);
 	}
 
 	// Calculates and updates velocity.x
@@ -666,6 +685,40 @@ public class Player : KinematicBody2D
 	//
 	private void PlayAnimation()
 	{
+		// switch (state)
+		// {
+		// 	case PlayerState.Idle:
+		// 		playerAnimation.Play("Idle");
+		// 		break;
+			
+		// 	case PlayerState.Run:
+		// 		playerAnimation.Play("Run");
+		// 		break;
+			
+		// 	case PlayerState.Jump:
+		// 		playerAnimation.Play("Jump0");
+		// 		break;
+
+		// 	case PlayerState.Climb:
+		// 		playerAnimation.Play("Climb");
+		// 		break;
+
+		// 	case PlayerState.WallSlide:
+		// 		playerAnimation.Play("WallSlide");
+		// 		break;
+
+		// 	case PlayerState.Dash:
+		// 		playerAnimation.Play("Dash");
+		// 		break;
+
+		// 	case PlayerState.Attack:
+		// 		playerAnimation.Play();
+		// 		break;
+			
+		// 	case PlayerState.Death:
+		// 		playerAnimation.Play("Death");
+		// 		break;
+		// }
 		// determines where player faces
 		if (lastFacingDirection == -1 && !IsOnWall())
 		{
@@ -676,81 +729,71 @@ public class Player : KinematicBody2D
 			playerAnimation.FlipH = false;
 		}
 
-		// Running
-		if (IsOnFloor())
+		if (!isDead)
 		{
-			if (velocity.x != 0)
+			// Running
+			if (IsOnFloor())
 			{
-				playerAnimation.Play("Run");
-			}
-			else
-			{
-				playerAnimation.Play("Idle");
-			}
-		} 
-		// Jump
-		else if (!isClimbing)
-		{	
-			if (velocity.y < 0)
-			{
-				playerAnimation.Play("Jump0");
-			}
-			else if (velocity.y > 0)
-			{
-				if (IsOnWall())
+				if (velocity.x != 0)
 				{
-					playerAnimation.Play("WallSlide");
+					playerAnimation.Play("Run");
 				}
 				else
 				{
-					playerAnimation.Play("Jump1");
+					playerAnimation.Play("Idle");
+				}
+			} 
+			// Jump
+			else if (!isClimbing)
+			{	
+				if (velocity.y < 0)
+				{
+					playerAnimation.Play("Jump0");
+				}
+				else if (velocity.y > 0)
+				{
+					if (IsOnWall())
+					{
+						playerAnimation.Play("WallSlide");
+					}
+					else
+					{
+						playerAnimation.Play("Jump1");
+					}
 				}
 			}
+			// Climb
+			else
+			{
+				if (velocity.y != 0 && IsOnWall())
+					playerAnimation.Play("Climb");
+				else if (velocity.y == 0 && IsOnWall())
+					playerAnimation.Play("WallSlide");
+				else if (velocity.y < 0)
+					playerAnimation.Play("Jump0");
+				else
+					playerAnimation.Play("Jump1");
+			}
+			
+			// Dash
+			if (isDashing)
+			{
+				playerAnimation.Play("Dash");
+			}
 		}
-		// Climb
+		// Death
 		else
 		{
-			if (velocity.y != 0 && IsOnWall())
-				playerAnimation.Play("Climb");
-			else if (velocity.y == 0 && IsOnWall())
-				playerAnimation.Play("WallSlide");
-			else if (velocity.y < 0)
-				playerAnimation.Play("Jump0");
-			else
-				playerAnimation.Play("Jump1");
+			playerAnimation.Play("Death");
+			CollisionShape2D collision = GetNode<CollisionShape2D>("CollisionShape2D");
+			collision.Disabled = true;
+			Position = deathPos;
+			if (playerAnimation.Frame > 5)
+			{
+				QueueFree();
+				GetTree().ReloadCurrentScene();
+			}
 		}
-		
-		// Dash
-		if (isDashing)
-		{
-			playerAnimation.Play("Dash");
-		}
-
-		// Death
-		if (isDead)
-		{
-			PlayDeathAnimation();
-		}
-	}
-	
-	// Instances a player death animation that is independent from the player. 
-	// Plays player death animation
-	//
-	// Parameters 
-	// ----------
-	//
-	// Returns
-	// -------
-	//
-	private void PlayDeathAnimation()
-	{
-		PackedScene PlayerDeath = GD.Load<PackedScene>("res://Player/PlayerDeath.tscn");
-		Node2D playerDeathEffect = (Node2D) PlayerDeath.Instance();
-		// NOTE: Must add instance as child of world, not player because player
-		// will be freed and instance will not be able to access player
-		GetParent().AddChild(playerDeathEffect); 
-		playerDeathEffect.GlobalPosition = GlobalPosition;
-		QueueFree();
 	}
 	
 	// Plays all effects related to the player
@@ -841,6 +884,7 @@ public class Player : KinematicBody2D
 	private void OnHurtboxBodyAreaEntered(object area)
 	{
 		isDead = true;
+		deathPos = Position;
 	}
 }
 

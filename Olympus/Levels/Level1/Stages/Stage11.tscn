@@ -56,6 +56,7 @@ position = Vector2( 464, 88 )
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.25, 1 )
 
 [node name="CaveBackground1" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
 position = Vector2( 264, 128 )

@@ -32,7 +32,6 @@ public class PlantProjectile : KinematicBody2D
 	// Signals
 	private void OnHitboxAttackAreaEntered(object area)
 	{
-		GD.Print("Projectile: Collided with something");
 		QueueFree();
 	}
 	
