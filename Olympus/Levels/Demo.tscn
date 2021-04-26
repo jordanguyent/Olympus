@@ -4,7 +4,6 @@
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Levels/Level1/Assets/TMDanger.tscn" type="PackedScene" id=3]
 
-
 [node name="Node2D" type="Node2D"]
 
 [node name="TMBlocks" parent="." instance=ExtResource( 1 )]

@@ -81,6 +81,7 @@ public class Player : KinematicBody2D
 	[Export] int INPUTBUFFERMAX = 5;
 	[Export] int WALLBUFFERMAX = 5;
 	[Export] int COYOTEFRAMES = 5;
+	[Export] int MAXEFFECTWINDOW = 5;
 
 	// Frame Data Variables
 	private int frameLockX = 0;
@@ -92,6 +93,7 @@ public class Player : KinematicBody2D
 	private int jumpBufferFrames = 0;
 	private int wallBufferFrames = 0;
 	private int coyoteFrames = 0;
+	private int effectWindow = 0;
 	
 	// Player Movement Variables
 	private Vector2 velocity = new Vector2(0,0);
@@ -400,7 +402,23 @@ public class Player : KinematicBody2D
 		{
 			justPressedJump = false;
 		}
-
+		
+		// use buffered jump as effect booster
+		if (justPressedJump && effectWindow > 0)
+		{
+			jumpBufferFrames = 0;
+			justPressedJump = false;
+			effectWindow = 0;
+			frameLockX += (frameLockX == 0) ? 0 : 5;
+			frameLockY += (frameLockY == 0) ? 0 : 5;
+		}
+		else if (effectWindow > 0)
+		{
+			effectWindow--;
+		}
+		
+		GD.Print(new string ('*', frameLockY));
+		
 		// This code here is for updating the last thing that the player 
 		// collided with in both the x and y directions. This information is
 		// important for jumping off walls.
@@ -841,7 +859,7 @@ public class Player : KinematicBody2D
 		else
 		{
 			playerAnimation.Play("Death");
-			CollisionShape2D collision = GetNode<CollisionShape2D>("CollisionShape2D");
+			CollisionShape2D collision = GetNode<CollisionShape2D>("Body");
 			collision.Disabled = true;
 			Position = deathPos;
 			if (playerAnimation.Frame > 5)
@@ -907,18 +925,40 @@ public class Player : KinematicBody2D
 	{
 		// We want the player to be able to get a boost if they can press the 
 		// spacebar at a near time.
-		int magnitude = (jumpBufferFrames > 0) ? 425 : 345;
+//		int magnitude = (jumpBufferFrames > 0) ? 425 : 345;
+//		if (degrees == 90 || degrees == 270) // vertical
+//		{
+//			velocity.y = -magnitude * Math.Sign(Math.Sin(degrees * Math.PI / 180));
+//		}
+//		else // horixontal
+//		{
+//			velocity.y = -200;
+//			velocity.x = -magnitude * 1.15f * Math.Sign(Math.Cos(degrees * Math.PI / 180));
+//
+//		}
+		int stall = 0;
+		if (jumpBufferFrames > 0)
+		{
+			stall = 10;
+		}
+		else
+		{
+			stall = 5;
+			effectWindow = MAXEFFECTWINDOW; // give 5 more frames to press space
+		}
+		
 		if (degrees == 90 || degrees == 270) // vertical
 		{
-			
-			velocity.y = -magnitude * Math.Sign(Math.Sin(degrees * Math.PI / 180));
+			velocity.y = -300 * Math.Sign(Math.Sin(degrees * Math.PI / 180));
+			frameLockY = stall;
 		}
 		else // horixontal
 		{
 			velocity.y = -200;
-			velocity.x = -magnitude * 1.15f * Math.Sign(Math.Cos(degrees * Math.PI / 180));
+			velocity.x = -345 * Math.Sign(Math.Cos(degrees * Math.PI / 180));
+			frameLockX = stall;
+			// frameLockY = stall;
 		}
-
 		// Reset jump frames so that if the player is jumping into a mushroom, 
 		// it is able to be shot down from the mushroom. In addition, this will
 		// We also reset jumpBufferFrames since we want the player to be able to
