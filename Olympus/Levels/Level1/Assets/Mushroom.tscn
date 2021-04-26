@@ -33,6 +33,7 @@ animations = [ {
 extents = Vector2( 8, 4 )
 
 [node name="Mushroom" type="StaticBody2D"]
+collision_layer = 0
 collision_mask = 0
 script = ExtResource( 4 )
 

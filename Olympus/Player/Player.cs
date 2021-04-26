@@ -1,6 +1,3 @@
-using Godot;
-using System;
-
 // DATE CREATED  : JAN 2020
 // AUTHOR(S)     : ALEXIS CHAVOYA, EDWIN ZHONG, JORDAN NGUYEN
 // 
@@ -26,22 +23,17 @@ using System;
 // ----------------------
 // 
 
-// All functions contained in this class appear as follows in the order:
-// 
-// public override void _Ready() 
-// public override void _PhysicsProcess(float delta)
-// private void HelperUpdatePlayerState()
-// private void HelperUpdateVelocityX(float delta)
-// private void HelperUpdateVelocityY(float delta)
-// private void HelperUpdateVelocityOnJump(bool justPressedJump)
-// private float HelperMoveToward(float current, float desire, float acceleration)
-// private void PlayAnimation()
-// private void PlayDeathAnimation()
-// private void PlayEffect()
-// 
-// private void OnFixedBounceableAreaEntered(object area)
-// private void OnHurtboxBodyAreaEntered(object area)
-// 
+// Preprocessor symbols
+#define DEBUGMODE
+
+// Dependencies
+using Godot;
+using System;
+using System.Diagnostics;
+
+
+
+// Will be converted to a FSM later
 public class Player : KinematicBody2D
 {
 	// Nodes
@@ -49,6 +41,10 @@ public class Player : KinematicBody2D
 	private AnimatedSprite playerAnimation = null;
 	private RayCast2D climbRay = null;
 	private RayCast2D kickRay = null;
+	private RayCast2D headLeftRay = null;
+	private RayCast2D headRightRay = null;
+	private RayCast2D headLeftMidRay = null;
+	private RayCast2D headRightMidRay = null;
 	
 	// Effect Variables
 	private PackedScene smokeEffect0 = null;
@@ -151,7 +147,12 @@ public class Player : KinematicBody2D
 	// -------
 	// 
 	public override void _Ready() 
-	{ 
+	{
+#if DEBUGMODE
+		// Bug Prevention Assertions
+		Debug.Assert(COYOTEFRAMES <= FRAMELOCKXY, "COYOTEFRAMES > FRAMELOCKXY, consider reducing to avoid strange jump behaviour!");
+#endif
+
 		// Getting player position
 		SceneHandler SCNHAND = (SceneHandler)GetNode("/root/SceneHandler");
 		if (SCNHAND == null)
@@ -183,6 +184,11 @@ public class Player : KinematicBody2D
 		playerAnimation = GetNode<AnimatedSprite>("AnimatedSprite");
 		climbRay = GetNode<RayCast2D>("ClimbRay");
 		kickRay  = GetNode<RayCast2D>("KickRay");
+		headLeftRay  = GetNode<RayCast2D>("HeadLeftRay");
+		headRightRay = GetNode<RayCast2D>("HeadRightRay");
+		headLeftMidRay  = GetNode<RayCast2D>("HeadLeftMidRay");
+		headRightMidRay = GetNode<RayCast2D>("HeadRightMidRay");
+		
 		playerAnimation.Play("Idle");
 		
 		// Loading Scenes
@@ -249,6 +255,19 @@ public class Player : KinematicBody2D
 			PlayEffects();
 		}
 		
+		// Moves player if they run into TMBlocks while jumping.
+		if (!IsOnFloor() && velocity.y < 0 && userInput.x == 0 && userInput.y == 0)
+		{
+			if (headLeftRay.IsColliding() && !headLeftMidRay.IsColliding() && headLeftRay.GetCollider() as TMBlocks != null)
+			{
+				HelperUpdatePosition(x : Position.x + 7 - (Position.x % 8));
+			}
+			if (!headRightMidRay.IsColliding() && headRightRay.IsColliding() && headRightRay.GetCollider() as TMBlocks != null)
+			{
+				HelperUpdatePosition(x : Position.x - (Position.x % 8) + 2);
+			}
+		}
+		
 		// Snaps the position of Player to nearest pixel Removes jittering of
 		// pixels
 		Position = Position.Snapped(Vector2.One);
@@ -281,12 +300,17 @@ public class Player : KinematicBody2D
 		jumpStrength = Input.GetActionStrength("ui_jump");
 		holdingGrab = Input.GetActionStrength("ui_grab") > 0;
 		
-		// Update last facing direction AND all RayCast2D accordingly
+		// Update last facing direction. Only update the RayCast2D if the player
+		// is not climbing so that the player can point away from the wall w/o
+		// walling off ie they can prepare for their walljump.
 		if (userInput.x != 0)
 		{
 			lastFacingDirection = Math.Sign(userInput.x);
-			climbRay.RotationDegrees = (lastFacingDirection - 1) * 90;
-			kickRay.RotationDegrees = (lastFacingDirection - 1) * 90;
+			if (!isClimbing)
+			{
+				climbRay.RotationDegrees = (lastFacingDirection - 1) * 90;
+				kickRay.RotationDegrees = (lastFacingDirection - 1) * 90;
+			}
 		}
 		
 		// Determine if the player is in a climbing state
@@ -352,7 +376,7 @@ public class Player : KinematicBody2D
 			}
 			// Dash counter counts only when the player is on the ground and not
 			// dashing
-			else if (!isDashing && dashRecharge > 0)
+			else if (dashRecharge > 0)
 			{
 				dashRecharge--;
 			}
@@ -471,6 +495,17 @@ public class Player : KinematicBody2D
 		{
 			coyoteFrames = COYOTEFRAMES;
 			jumpCount = DEFAULTJUMPCOUNT;
+			headLeftRay.Enabled = false;
+			headRightRay.Enabled = false;
+			headLeftMidRay.Enabled = false;
+			headRightMidRay.Enabled = false;
+		}
+		else
+		{
+			headLeftRay.Enabled = true;
+			headRightRay.Enabled = true;
+			headLeftMidRay.Enabled = true;
+			headRightMidRay.Enabled = true;
 		}
 	}
 
@@ -556,16 +591,19 @@ public class Player : KinematicBody2D
 				// how the player moves on wall in a way that feels natural.
 				velocity.y = HelperMoveToward(velocity.y, -MAXCLIMBSPEED * userInput.y, delta * GRAVITY * wallFrictionFactor);
 			}
-			// We want a "friction" like thing when player is on a wall, but 
-			// only if he is already falling not when he is on the way up.
-			else if (IsOnWall() && velocity.y > 0)
+			// We want a "friction" like thing when player can be interacting
+			// with a wall ie their climbray is touching the wall, but only if
+			// he is already falling not when he is on the way up.
+			else if (IsOnWall() && climbRay.IsColliding() && velocity.y > 0)
 			{
 				velocity.y += .001f; // to prevent being still on the wall
 				velocity.y = HelperMoveToward(velocity.y, MAXCLIMBSPEED, delta * GRAVITY * STDWALLFRICTIONFACTOR);
 			}
 			// If we are just in the air we want gravity to be applied until 
-			// the player reaches their terminal velocity, MAXSPEEDY. 
-			else
+			// the player reaches their terminal velocity, MAXSPEEDY. Since we
+			// only want gravity to apply after the coyote frames, we include
+			// this here. This works so long as COYOTEFRAMES <= FRAMELOCKXY
+			else //if (coyoteFrames == 0)
 			{
 				velocity.y = HelperMoveToward(velocity.y, MAXSPEEDY, delta * GRAVITY);
 			}
@@ -609,6 +647,7 @@ public class Player : KinematicBody2D
 					jumpFrames = MAXJUMPFRAME;
 					lastOnFloor = true;
 					jumpBufferFrames = 0;
+					coyoteFrames = 0;
 					jumpCount--;
 				}
 				// When player is on wall, use direction of last collision to
@@ -672,6 +711,23 @@ public class Player : KinematicBody2D
 	private float HelperMoveToward(float current, float desire, float acceleration)
 	{
 		return (E1 * current).MoveToward(E1 * desire, acceleration).x;
+	}
+	
+	// Helper function to update the player position.
+	// 
+	// Parameters 
+	// ----------
+	// x : x value to update position to
+	// y : y value to update position to
+	// 
+	// Returns
+	// -------
+	// 
+	private void HelperUpdatePosition(float x = float.NaN, float y = float.NaN)
+	{
+		x = (float.IsNaN(x)) ? Position.x : x;
+		y = (float.IsNaN(y)) ? Position.y : y;
+		Position = new Vector2(x, y);
 	}
 	
 	// Plays the animations for the Player within one function rather than 
@@ -869,6 +925,7 @@ public class Player : KinematicBody2D
 		// try again if they missed it.
 		jumpFrames = 0;
 		jumpBufferFrames = 0;
+		coyoteFrames = 0;
 	}
 	
 	// Signal - since the player only has one HP (health point) then whenever
