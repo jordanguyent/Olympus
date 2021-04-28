@@ -3,6 +3,8 @@ using System;
 
 public class Follow : Camera2D
 {
+	// loads camera frames after player
+	[Export] int loadDelay = 1;
 
 	// Camera Constants
 	private int STANDARDLIMIT = 10000000;
@@ -15,23 +17,20 @@ public class Follow : Camera2D
 	private Vector2 currentPosition;
 	private Vector2 destinationPosition;
 	private Vector2 offset = Vector2.Zero;
-	private Vector2 targetPos;
 	private Vector2 clampedPos;
 	private bool cameraClamped = false;
 	private int lPosLim = -10000000;
 	private int rPosLim = 10000000;
 	private int uPosLim = -10000000;
 	private int dPosLim = 10000000;
-
 	private int currentCameraID = 1;
 	private int newCameraID = 1;
-	
-	// initialize timer
-	private int initTimer = 1;
-
 
 	// Parent Node
 	private Node2D parent = null;
+
+	// Temp solution to camera load
+	int loadTimer = 1;
 
 	enum CameraState 
 	{
@@ -45,40 +44,16 @@ public class Follow : Camera2D
 	CameraState state = CameraState.Init;
 	CameraState changeState;
 
-	// [Consider] [TODO] Make camera parent of world not player
-
-	// NOTE: Set the LIMIT to the size of the stage.
-	// Set the POSITION to place the camera is designated area within the limit.
-	// Need function to change position. 
-
-	// Create these functions, these functions most likely going to be running constantly
-	// FollowPlayer
-	// LimitPosition
-	// PositionOffsetFromPlayer
-	// SetPosition
-	// DragMargin // may need a grid position
-	// may need to enable smoothing in some cases
-	//	When camera follows player, no smoothing, when moving
-	//	camera to specific position, smoothing on.
-	// NVM, must have camera smoothing on, but on place, smoothing speed is 
-	// large
-
-
-	// anchoring
-	// changing pos limit
-	// player follow
-	// player enters area, emit signal to camera to change camera settings
-
-	// States:
-	// locked on player
-	// static
+	// Called when node first enters the scene.
+	// Sets the camera to the top level and establishes parent and camera width
+	// and height
+	//
+	// Parameters 
+	// ----------
 	// 
-
-	
-
-	// make simple fade in and out transition. can be used for everything
-
-	// Called when the node enters the scene tree for the first time.
+	// Returns
+	// -------
+	// 
 	public override void _Ready()
 	{
 		// initialization
@@ -91,74 +66,95 @@ public class Follow : Camera2D
 		CAMERAWIDTH = (int) GetViewport().GetVisibleRect().Size.x;
 		CAMERAHEIGHT = (int) GetViewport().GetVisibleRect().Size.y;
 
-		// initialize variables
-		currentPosition = parent.Position;
-		targetPos = parent.Position;
-
 		// Set camera to current
 		MakeCurrent();
 	}
 
-	// small stutter when changing camera settings.
-	// may need to fix transition state for now.
-
+	// Called every frame. Camera state is processed in this function.
+	//
+	// Parameters 
+	// ----------
+	// delta : time elapsed since previous frame
+	// 
+	// Returns
+	// -------
+	// 
 	public override void _PhysicsProcess(float delta)
 	{
-		switch (state)
+		if (loadDelay <= 0)
 		{
-			case CameraState.Init:
-				currentPosition = parent.Position;
-				state = CameraState.Dynamic;
-				break;
+			switch (state)
+			{
+				case CameraState.Init:
+					Position = parent.Position + offset;
+					Position = ClampPosition(lPosLim, rPosLim, uPosLim, dPosLim);
+					currentPosition = Position;
+					state = CameraState.Dynamic;
+					break;
 
-			case CameraState.Static:
-				clampedPos = ClampPosition(lPosLim, rPosLim, uPosLim, dPosLim);
-				ArriveTo(clampedPos, Vector2.Zero, delta);
-				break;
-
-			case CameraState.Dynamic:
-				clampedPos = ClampPosition(lPosLim, rPosLim, uPosLim, dPosLim);
-				targetPos = (cameraClamped) ? clampedPos : parent.Position;
-				ArriveTo(targetPos, offset, delta);
-				break;
-
-			case CameraState.Transition:
-				if (currentCameraID != newCameraID)
-				{
-					smoothingDuration = 0.2f;
+				// may need to just remove camera state
+				case CameraState.Static:
 					clampedPos = ClampPosition(lPosLim, rPosLim, uPosLim, dPosLim);
-					targetPos = (cameraClamped) ? clampedPos : parent.Position;
-					ArriveTo(targetPos, offset, delta);
-					GD.Print(Position.Snapped(Vector2.One), " ", targetPos.Snapped(Vector2.One));
-					if (Position.Snapped(Vector2.One) == targetPos.Snapped(Vector2.One))
+					ArriveTo(clampedPos, delta);
+					break;
+
+				case CameraState.Dynamic:
+					Position = parent.Position + offset; // offset adjusted here
+					clampedPos = ClampPosition(lPosLim, rPosLim, uPosLim, dPosLim);
+					ArriveTo(clampedPos, delta);
+					break;
+
+				case CameraState.Transition:
+					if (currentCameraID != newCameraID)
+					{
+						smoothingDuration = 0.2f;
+						Position = parent.Position + offset;
+						clampedPos = ClampPosition(lPosLim, rPosLim, uPosLim, dPosLim);
+						ArriveTo(clampedPos, delta);
+						if (Position.Snapped(Vector2.One) == clampedPos.Snapped(Vector2.One))
+						{
+							smoothingDuration = updatedSmoothDuration;
+							currentCameraID = newCameraID;
+							state = changeState;
+						}
+					}
+					else
 					{
 						smoothingDuration = updatedSmoothDuration;
-						currentCameraID = newCameraID;
 						state = changeState;
 					}
-				}
-				else
-				{
-					smoothingDuration = updatedSmoothDuration;
-					state = changeState;
-				}
-				
-				break;
+					
+					break;
+			}
 		}
-	}
-	
-	public void SetLimits(int up, int down, int left, int right)
-	{
-		// These are variables that are defined in parent class
-		LimitTop = up;
-		LimitBottom = down;
-		LimitLeft = left;
-		LimitRight = right;
+		else
+		{
+			// Load delay necessary to make sure camera loads at correct position
+			loadDelay--;
+
+			// initialize camera position
+			Position = parent.Position + offset;
+			Position = ClampPosition(lPosLim, rPosLim, uPosLim, dPosLim);
+
+			// initialize variables
+			currentPosition = Position;
+		}
+		
 	}
 
-	public Vector2 ArriveTo(Vector2 targetPosition, Vector2 offset, float delta)
+	// Creates camera smoothings from targetPosition to destination.
+	//
+	// Parameters 
+	// ----------
+	// targetPosition: camera's destinaton target
+	// delta : time elapsed since previous frame
+	//
+	// Returns
+	// -------
+	// 
+	public void ArriveTo(Vector2 targetPosition, float delta)
 	{
-		destinationPosition = targetPosition + offset; // offset goes here
+		destinationPosition = targetPosition;
 		Vector2 distance = new Vector2(destinationPosition.x - currentPosition.x, destinationPosition.y - currentPosition.y);
 		if (Math.Abs(distance.x) < .3)
 		{
@@ -168,67 +164,79 @@ public class Follow : Camera2D
 		{
 			distance.y = 0;
 		}
-		currentPosition +=  distance / smoothingDuration * delta;
-		Position = currentPosition;
-		
-		// // Snaps camera to pixel after smoothing is finished
-		// if (distance / smoothingDuration * delta == Vector2.Zero)
-		// {
-		// 	Position = Position.Snapped(Vector2.One);
-		// }
+		currentPosition += distance / smoothingDuration * delta;
+		Position = currentPosition.Snapped(Vector2.One);
 
 		ForceUpdateScroll();
-
-		return distance;
 	}
 
+
+	// Creates camera smoothings from targetPosition to destination.
+	//
+	// Parameters 
+	// ----------
+	// x1: left bound
+	// x2: right bound
+	// y1: up bound
+	// y2: down bound
+	// 
+	// Returns
+	// -------
+	// Vector2: new clamped position vector
+	//
 	public Vector2 ClampPosition(int x1, int x2, int y1, int y2)
 	{
 		float x;
 		float y;
 
-		int camOffsetWidth = 0;
-		int camOffsetHeight = 0;
-		// int camOffsetWidth = CAMERAWIDTH / 2;
-		// int camOffsetHeight = CAMERAHEIGHT / 2;
-		
-		Position = parent.Position;
+		int cameraPaddingX = CAMERAWIDTH / 2;
+		int cameraPaddingY = CAMERAHEIGHT / 2;
 
-		if (Position.x < x1 + camOffsetWidth)
+		if (Position.x - cameraPaddingX < x1)
 		{
-			cameraClamped = true;
-			x = x1 + camOffsetWidth;
+			x = x1 + cameraPaddingX;
 		} 
-		else if (Position.x > x2 - camOffsetWidth)
+		else if (Position.x + cameraPaddingX > x2)
 		{
-			cameraClamped = true;
-			x = x2 - camOffsetWidth;
+			x = x2 - cameraPaddingX;
 		}
 		else 
 		{
-			cameraClamped = false;
 			x = Position.x;
 		}
 
-		if (Position.y < y1 + camOffsetHeight)
+		if (Position.y - cameraPaddingY - 1 < y1)
 		{
-			cameraClamped = true;
-			y = y1 + camOffsetHeight;
+			y = y1 + cameraPaddingY + 1;
 		}
-		else if (Position.y > y2 - camOffsetHeight)
+		else if (Position.y + cameraPaddingY > y2)
 		{
-			cameraClamped = true;
-			y = y2 - camOffsetHeight;
+			y = y2 - cameraPaddingY;
 		}
 		else 
 		{
-			cameraClamped = false;
 			y = Position.y;
 		}
 
 		return new Vector2(x, y);
 	}
 
+	// SIGNAL
+	// Runs when player enters area2D for camera setting change.
+	//
+	// Parameters 
+	// ----------
+	// st: new state
+	// off: camera offset from target
+	// scale: camera zoom
+	// tlPosLim: top left bound for position
+	// brPosLim: bottom right bound for position
+	// sd: new smoothing duration
+	// id: camera ID
+	// 
+	// Returns
+	// -------
+	//
 	public void ChangeCameraSettings(int st, Vector2 off, Vector2 scale, Vector2 tlPosLim, Vector2 brPosLim, float sd, int id)
 	{
 		// changes the state

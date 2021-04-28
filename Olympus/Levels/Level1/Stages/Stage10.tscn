@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Levels/Level1/Assets/TMDanger.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMBlocks.tscn" type="PackedScene" id=2]
@@ -10,6 +10,10 @@
 [ext_resource path="res://Boxes/ZoneB.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Levels/Level1/Background/CaveBackground1.png" type="Texture" id=9]
 [ext_resource path="res://Levels/Level1/Background/CaveBackground2.png" type="Texture" id=10]
+[ext_resource path="res://Cameras/CameraChange.tscn" type="PackedScene" id=11]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 8, 24 )
 
 [node name="Stage10" type="Node2D"]
 script = ExtResource( 5 )
@@ -54,3 +58,21 @@ texture = ExtResource( 9 )
 [node name="CaveBackground2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
 position = Vector2( 208, 112 )
 texture = ExtResource( 10 )
+
+[node name="CameraChange" parent="." instance=ExtResource( 11 )]
+position = Vector2( 8, 96 )
+runOnce = true
+
+[node name="CollisionShape2D" parent="CameraChange" index="0"]
+shape = SubResource( 1 )
+
+[node name="CameraChange2" parent="." instance=ExtResource( 11 )]
+position = Vector2( 392, 112 )
+runOnce = true
+
+[node name="CollisionShape2D" parent="CameraChange2" index="0"]
+shape = SubResource( 1 )
+
+[editable path="CameraChange"]
+
+[editable path="CameraChange2"]

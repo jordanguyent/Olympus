@@ -35,15 +35,15 @@ tile_data = PoolIntArray( -2, 0, 720896, -1, 0, 2, -65536, 0, 3, -65535, 0, 3, -
 position = Vector2( 464, 104 )
 
 [node name="CameraChange" parent="." instance=ExtResource( 7 )]
-position = Vector2( 8, 184 )
-state = 2
+position = Vector2( 16, 152 )
+runOnce = true
 
 [node name="CollisionShape2D" parent="CameraChange" index="0"]
 shape = SubResource( 1 )
 
 [node name="CameraChange2" parent="." instance=ExtResource( 7 )]
-position = Vector2( 384, 144 )
-state = 2
+position = Vector2( 384, 128 )
+runOnce = true
 
 [node name="CollisionShape2D" parent="CameraChange2" index="0"]
 shape = SubResource( 1 )

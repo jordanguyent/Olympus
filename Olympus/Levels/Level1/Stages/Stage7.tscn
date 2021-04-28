@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=2]
@@ -12,6 +12,10 @@
 [ext_resource path="res://Levels/Level1/Assets/BreakablePlatformV.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Levels/Level1/Background/BigCaveBackground1.png" type="Texture" id=11]
 [ext_resource path="res://Levels/Level1/Background/CaveBackground2.png" type="Texture" id=12]
+[ext_resource path="res://Cameras/CameraChange.tscn" type="PackedScene" id=13]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 8, 32 )
 
 [node name="Stage7" type="Node2D"]
 script = ExtResource( 5 )
@@ -51,15 +55,61 @@ position = Vector2( 344, 176 )
 motion_scale = Vector2( 0.25, 1 )
 
 [node name="BigCaveBackground1" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
-position = Vector2( 296, 168 )
+position = Vector2( 168, 168 )
 texture = ExtResource( 11 )
 
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
 
-[node name="CaveBackground2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
-position = Vector2( 232, 312 )
+[node name="CaveBackground3" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
+position = Vector2( 280, 16.5 )
 texture = ExtResource( 12 )
 
-[node name="CaveBackground2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2/CaveBackground2"]
-position = Vector2( 96, -296 )
+[node name="CaveBackground2" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
+position = Vector2( 184, 312.5 )
 texture = ExtResource( 12 )
+
+[node name="CameraChange" parent="." instance=ExtResource( 13 )]
+position = Vector2( 8, 88 )
+runOnce = true
+offset = Vector2( 0, 30 )
+botRightPosLim = Vector2( 400, 336 )
+
+[node name="CollisionShape2D" parent="CameraChange" index="0"]
+shape = SubResource( 1 )
+
+[node name="CameraChange3" parent="." instance=ExtResource( 13 )]
+position = Vector2( 136, 264 )
+cameraID = 2
+state = 3
+offset = Vector2( 0, 30 )
+botRightPosLim = Vector2( 400, 336 )
+
+[node name="CollisionShape2D" parent="CameraChange3" index="0"]
+shape = SubResource( 1 )
+
+[node name="CameraChange2" parent="." instance=ExtResource( 13 )]
+position = Vector2( 168, 264 )
+cameraID = 3
+state = 3
+topLeftPosLim = Vector2( 144, 0 )
+botRightPosLim = Vector2( 568, 336 )
+
+[node name="CollisionShape2D" parent="CameraChange2" index="0"]
+shape = SubResource( 1 )
+
+[node name="CameraChange4" parent="." instance=ExtResource( 13 )]
+position = Vector2( 560, 264 )
+runOnce = true
+topLeftPosLim = Vector2( 144, 0 )
+botRightPosLim = Vector2( 568, 336 )
+
+[node name="CollisionShape2D" parent="CameraChange4" index="0"]
+shape = SubResource( 1 )
+
+[editable path="CameraChange"]
+
+[editable path="CameraChange3"]
+
+[editable path="CameraChange2"]
+
+[editable path="CameraChange4"]

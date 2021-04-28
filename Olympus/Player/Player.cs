@@ -154,7 +154,6 @@ public class Player : KinematicBody2D
 		// Bug Prevention Assertions
 		Debug.Assert(COYOTEFRAMES <= FRAMELOCKXY, "COYOTEFRAMES > FRAMELOCKXY, consider reducing to avoid strange jump behaviour!");
 #endif
-
 		// Getting player position
 		SceneHandler SCNHAND = (SceneHandler)GetNode("/root/SceneHandler");
 		if (SCNHAND == null)
@@ -210,7 +209,6 @@ public class Player : KinematicBody2D
 	//   
 	public override void _PhysicsProcess(float delta)
 	{
-		
 		// Checking collisions
 		int totalCollisions = GetSlideCount();
 		for(int i = 0; i < totalCollisions; i++)
@@ -417,7 +415,7 @@ public class Player : KinematicBody2D
 			effectWindow--;
 		}
 		
-		GD.Print(new string ('*', frameLockY));
+		//GD.Print(new string ('*', frameLockY));
 		
 		// This code here is for updating the last thing that the player 
 		// collided with in both the x and y directions. This information is
@@ -794,11 +792,11 @@ public class Player : KinematicBody2D
 		// 		break;
 		// }
 		// determines where player faces
-		if (lastFacingDirection == -1 && !IsOnWall())
+		if (climbRay.RotationDegrees == -180 && !isDashing)
 		{
 			playerAnimation.FlipH = true;
 		}
-		else if (lastFacingDirection == 1  && !IsOnWall())
+		else if (climbRay.RotationDegrees == 0 && !isDashing)
 		{
 			playerAnimation.FlipH = false;
 		}

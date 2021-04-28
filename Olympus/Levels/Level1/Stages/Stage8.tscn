@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMBlocks.tscn" type="PackedScene" id=2]
@@ -11,6 +11,10 @@
 [ext_resource path="res://Levels/Level1/Assets/BreakablePlatformH.tscn" type="PackedScene" id=9]
 [ext_resource path="res://Levels/Level1/Background/CaveBackground1.png" type="Texture" id=10]
 [ext_resource path="res://Levels/Level1/Background/CaveBackground3.png" type="Texture" id=11]
+[ext_resource path="res://Cameras/CameraChange.tscn" type="PackedScene" id=12]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 8, 32 )
 
 [node name="Stage8" type="Node2D"]
 script = ExtResource( 5 )
@@ -56,7 +60,7 @@ position = Vector2( 336, 128 )
 motion_scale = Vector2( 0.25, 1 )
 
 [node name="CaveBackground1" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
-position = Vector2( 336, 144 )
+position = Vector2( 208, 144 )
 scale = Vector2( 1, 1.22778 )
 texture = ExtResource( 10 )
 
@@ -64,9 +68,29 @@ texture = ExtResource( 10 )
 motion_scale = Vector2( 0.5, 1 )
 
 [node name="CaveBackground3" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
-position = Vector2( 154, 160 )
+position = Vector2( 88, 160.5 )
 texture = ExtResource( 11 )
 
 [node name="CaveBackground4" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
-position = Vector2( 474, 160 )
+position = Vector2( 408, 160.5 )
 texture = ExtResource( 11 )
+
+[node name="CameraChange" parent="." instance=ExtResource( 12 )]
+position = Vector2( 8, 176 )
+runOnce = true
+botRightPosLim = Vector2( 696, 225 )
+
+[node name="CollisionShape2D" parent="CameraChange" index="0"]
+shape = SubResource( 1 )
+
+[node name="CameraChange2" parent="." instance=ExtResource( 12 )]
+position = Vector2( 688, 80 )
+runOnce = true
+botRightPosLim = Vector2( 696, 225 )
+
+[node name="CollisionShape2D" parent="CameraChange2" index="0"]
+shape = SubResource( 1 )
+
+[editable path="CameraChange"]
+
+[editable path="CameraChange2"]

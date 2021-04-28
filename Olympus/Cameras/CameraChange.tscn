@@ -7,6 +7,5 @@ position = Vector2( 152, 176 )
 collision_layer = 0
 collision_mask = 32
 script = ExtResource( 1 )
-state = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
