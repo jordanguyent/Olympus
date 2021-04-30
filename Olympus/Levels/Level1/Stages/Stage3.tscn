@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Levels/Level1/Assets/TMBlocks.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=2]
@@ -10,6 +10,7 @@
 [ext_resource path="res://Levels/Level1/Background/WoodsBackgroundHorizontal3.png" type="Texture" id=8]
 [ext_resource path="res://Boxes/ZoneB.tscn" type="PackedScene" id=9]
 [ext_resource path="res://Boxes/ZoneA.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Transitions/SceneChanger.tscn" type="PackedScene" id=12]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 16, 32 )
@@ -78,6 +79,8 @@ botRightPosLim = Vector2( 760, 225 )
 
 [node name="CollisionShape2D" parent="CameraChange2" index="0"]
 shape = SubResource( 1 )
+
+[node name="SceneChanger" parent="." instance=ExtResource( 12 )]
 
 [editable path="CameraChange"]
 

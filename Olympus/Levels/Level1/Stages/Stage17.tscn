@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://Levels/World.cs" type="Script" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=2]
@@ -13,6 +13,7 @@
 [ext_resource path="res://Levels/Level1/Background/WoodsBackgroundHorizontal1.png" type="Texture" id=11]
 [ext_resource path="res://Levels/Level1/Background/WoodsBackgroundHorizontal2.png" type="Texture" id=12]
 [ext_resource path="res://Cameras/CameraChange.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Transitions/SceneChanger.tscn" type="PackedScene" id=14]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8, 32 )
@@ -121,6 +122,8 @@ botRightPosLim = Vector2( 648, 225 )
 
 [node name="CollisionShape2D" parent="CameraChange3" index="0"]
 shape = SubResource( 2 )
+
+[node name="SceneChanger" parent="." instance=ExtResource( 14 )]
 
 [editable path="CameraChange"]
 

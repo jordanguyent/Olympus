@@ -13,6 +13,9 @@ collision_layer = 16
 collision_mask = 0
 script = ExtResource( 3 )
 
+[node name="PlantProjectile" type="Sprite" parent="."]
+texture = ExtResource( 1 )
+
 [node name="Hitbox(Attack)" parent="." instance=ExtResource( 2 )]
 collision_layer = 2147483664
 collision_mask = 5
@@ -20,8 +23,5 @@ script = ExtResource( 4 )
 
 [node name="CollisionShape2D" parent="Hitbox(Attack)" index="0"]
 shape = SubResource( 1 )
-
-[node name="PlantProjectile" type="Sprite" parent="."]
-texture = ExtResource( 1 )
 
 [editable path="Hitbox(Attack)"]

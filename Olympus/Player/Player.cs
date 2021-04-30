@@ -45,6 +45,7 @@ public class Player : KinematicBody2D
 	private RayCast2D headRightRay = null;
 	private RayCast2D headLeftMidRay = null;
 	private RayCast2D headRightMidRay = null;
+	private ColorRect transitionRect = null;
 	
 	// Effect Variables
 	private PackedScene smokeEffect0 = null;
@@ -52,6 +53,9 @@ public class Player : KinematicBody2D
 	
 	// Signals
 	[Signal] public delegate void PlayerDeath();
+
+	[Signal]
+	public delegate void TransitionPlayer(String transitionAnimation);
 
 	// World Movement Constants
 	[Export] int MAXSPEEDX = 100;
@@ -137,6 +141,8 @@ public class Player : KinematicBody2D
 		Attack,
 		Death
 	}
+
+
 	
 	// Called when the node enters the scene tree for the first time.
 	// Called when the node enters the scene tree for the first time. Used to
@@ -190,11 +196,18 @@ public class Player : KinematicBody2D
 		headLeftMidRay  = GetNode<RayCast2D>("HeadLeftMidRay");
 		headRightMidRay = GetNode<RayCast2D>("HeadRightMidRay");
 		
+		// transition animation for death
+		transitionRect = GetNode<ColorRect>("TransitionRect");
+
+		// Plays default animation
 		playerAnimation.Play("Idle");
 		
 		// Loading Scenes
 		smokeEffect0 = GD.Load<PackedScene>("res://Effects/SmokeParticle.tscn");
 		smokeEffect1 = GD.Load<PackedScene>("res://Effects/SmokeParticle2.tscn");
+
+		// Connecting Signals
+		Connect("TransitionPlayer", transitionRect, "PlayTransition");
 	}
 	
 	// Obtains information about user input and uses information to calculate
@@ -860,8 +873,12 @@ public class Player : KinematicBody2D
 			CollisionShape2D collision = GetNode<CollisionShape2D>("Body");
 			collision.Disabled = true;
 			Position = deathPos;
-			if (playerAnimation.Frame > 5)
+			if (playerAnimation.Frame == 1)
 			{
+				EmitSignal("TransitionPlayer", "Fade");
+			}
+			if (playerAnimation.Frame > 5)
+			{	
 				QueueFree();
 				GetTree().ReloadCurrentScene();
 			}
@@ -980,6 +997,20 @@ public class Player : KinematicBody2D
 	{
 		isDead = true;
 		deathPos = Position;
+	}
+
+	// Signal - Runs after the transition animation has finished. Connected from
+	// TransitionRect.cs.
+	//
+	// Parameters 
+	// ----------
+	// 
+	// Returns
+	// -------
+	//
+	private void AfterAnimationFinished()
+	{
+		
 	}
 }
 

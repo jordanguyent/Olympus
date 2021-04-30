@@ -56,12 +56,11 @@ public class Follow : Camera2D
 	// 
 	public override void _Ready()
 	{
-		// initialization
 		SetAsToplevel(true);
 
 		// get node
 		parent = GetNode<Node2D>("../");
-
+		
 		// initialize constants
 		CAMERAWIDTH = (int) GetViewport().GetVisibleRect().Size.x;
 		CAMERAHEIGHT = (int) GetViewport().GetVisibleRect().Size.y;
