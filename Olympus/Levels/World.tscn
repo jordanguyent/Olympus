@@ -5,7 +5,7 @@
 [ext_resource path="res://Levels/Level1/Assets/TMDanger.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Levels/Level1/Assets/TMClimable.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=5]
-[ext_resource path="res://Sprites/Level1/background.png" type="Texture" id=6]
+[ext_resource path="res://Levels/Level1/Background/SkyBackground1.png" type="Texture" id=6]
 [ext_resource path="res://Levels/World.cs" type="Script" id=7]
 [ext_resource path="res://Levels/Level1/Assets/Mushroom.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Levels/Level1/Assets/BreakablePlatformH.tscn" type="PackedScene" id=9]
@@ -25,11 +25,12 @@ script = ExtResource( 7 )
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
-visible = false
 motion_scale = Vector2( 0.8, 1 )
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
-position = Vector2( 272, 144 )
+visible = false
+position = Vector2( 326, 230.125 )
+scale = Vector2( 1.93, 2.61444 )
 texture = ExtResource( 6 )
 
 [node name="TMBackground" parent="." instance=ExtResource( 5 )]
@@ -84,19 +85,19 @@ position = Vector2( -88, 72 )
 
 [node name="CameraChange" parent="." instance=ExtResource( 12 )]
 position = Vector2( 344, 256 )
-smoothingDuration = 0.1
+cameraID = 2
 state = 3
+smoothingDuration = 0.1
 topLeftPosLim = Vector2( 448, 256 )
 botRightPosLim = Vector2( 600, 256 )
-cameraID = 2
 
 [node name="CollisionShape2D" parent="CameraChange" index="0"]
 shape = SubResource( 1 )
 
 [node name="CameraChange2" parent="." instance=ExtResource( 12 )]
 position = Vector2( 288, 256 )
-smoothingDuration = 0.1
 state = 3
+smoothingDuration = 0.1
 topLeftPosLim = Vector2( -10000, -10000 )
 botRightPosLim = Vector2( 100000, 100000 )
 

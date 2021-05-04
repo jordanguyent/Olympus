@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://Levels/Level1/Assets/TMBackground.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/Level1/Assets/TMBlocks.tscn" type="PackedScene" id=2]
@@ -13,6 +13,7 @@
 [ext_resource path="res://Levels/Level1/Background/CaveBackground3.png" type="Texture" id=11]
 [ext_resource path="res://Cameras/CameraChange.tscn" type="PackedScene" id=12]
 [ext_resource path="res://Transitions/SceneChanger.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Shaders/Fog1.tscn" type="PackedScene" id=14]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8, 32 )
@@ -93,6 +94,9 @@ botRightPosLim = Vector2( 696, 225 )
 shape = SubResource( 1 )
 
 [node name="SceneChanger" parent="." instance=ExtResource( 13 )]
+
+[node name="Fog1" parent="." instance=ExtResource( 14 )]
+position = Vector2( 992, 720 )
 
 [editable path="CameraChange"]
 
