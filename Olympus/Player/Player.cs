@@ -195,6 +195,8 @@ public class Player : KinematicBody2D
 		headRightRay = GetNode<RayCast2D>("HeadRightRay");
 		headLeftMidRay  = GetNode<RayCast2D>("HeadLeftMidRay");
 		headRightMidRay = GetNode<RayCast2D>("HeadRightMidRay");
+		// TMEPORARY
+		PlayerData PLAYERDATA = GetNode<PlayerData>("/root/PlayerData");
 		
 		// transition animation for death
 		transitionRect = GetNode<ColorRect>("TransitionRect");
@@ -208,6 +210,7 @@ public class Player : KinematicBody2D
 
 		// Connecting Signals
 		Connect("TransitionPlayer", transitionRect, "PlayTransition");
+		Connect("PlayerDeath", PLAYERDATA, "IncrementDeathCount");
 	}
 	
 	// Obtains information about user input and uses information to calculate
@@ -879,6 +882,9 @@ public class Player : KinematicBody2D
 			}
 			if (playerAnimation.Frame > 5)
 			{	
+				// TEMPORARY ====================================
+				EmitSignal("PlayerDeath");
+				// =============================================
 				QueueFree();
 				GetTree().ReloadCurrentScene();
 			}
@@ -1000,7 +1006,8 @@ public class Player : KinematicBody2D
 	}
 
 	// Signal - Runs after the transition animation has finished. Connected from
-	// TransitionRect.cs.
+	// TransitionRect.cs. This doesn't actually run since scene resets before 
+	// animation finished.
 	//
 	// Parameters 
 	// ----------

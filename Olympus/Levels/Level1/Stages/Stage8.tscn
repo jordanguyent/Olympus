@@ -96,7 +96,6 @@ shape = SubResource( 1 )
 [node name="SceneChanger" parent="." instance=ExtResource( 13 )]
 
 [node name="Fog1" parent="." instance=ExtResource( 14 )]
-position = Vector2( 992, 720 )
 
 [editable path="CameraChange"]
 
