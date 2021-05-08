@@ -84,7 +84,7 @@ public class Player : KinematicBody2D
 	[Export] int MAXJUMPFRAME = 10;
 	[Export] int INPUTBUFFERMAX = 5;
 	[Export] int WALLBUFFERMAX = 5;
-	[Export] int COYOTEFRAMES = 5;
+	[Export] int COYOTEFRAMES = 3;
 	[Export] int MAXEFFECTWINDOW = 5;
 
 	// Frame Data Variables
