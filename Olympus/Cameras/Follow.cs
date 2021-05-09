@@ -25,6 +25,7 @@ public class Follow : Camera2D
 	private int dPosLim = 10000000;
 	private int currentCameraID = 1;
 	private int newCameraID = 1;
+	private bool cameraInit = false;
 
 	// Parent Node
 	private Node2D parent = null;
@@ -85,6 +86,7 @@ public class Follow : Camera2D
 			switch (state)
 			{
 				case CameraState.Init:
+					cameraInit = true;
 					Position = parent.Position + offset;
 					Position = ClampPosition(lPosLim, rPosLim, uPosLim, dPosLim);
 					currentPosition = Position;
@@ -104,7 +106,13 @@ public class Follow : Camera2D
 					break;
 
 				case CameraState.Transition:
-					if (currentCameraID != newCameraID)
+
+					if (!cameraInit && currentCameraID == newCameraID) // snaps camera to target immediately
+					{
+						smoothingDuration = updatedSmoothDuration;
+						state = changeState;
+					}
+					else // smooths camera to target
 					{
 						smoothingDuration = 0.2f;
 						Position = parent.Position + offset;
@@ -117,11 +125,7 @@ public class Follow : Camera2D
 							state = changeState;
 						}
 					}
-					else
-					{
-						smoothingDuration = updatedSmoothDuration;
-						state = changeState;
-					}
+					
 					
 					break;
 			}
