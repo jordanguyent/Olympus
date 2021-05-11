@@ -9,11 +9,10 @@ public class BreakablePlatformEffect : Area2D
 	[Export] int SDELAY = 150;
 	private int bTimer;
 	private int sTimer;
-	
 	private bool inArea = false;
 	private bool isBreaking = false;
 	private bool isRespawning = false;
-
+	private bool isOn = true;
 	private Vector2 spritePos;
 
 	// Objects
@@ -23,6 +22,18 @@ public class BreakablePlatformEffect : Area2D
 	// Signals
 	[Signal] public delegate void area_entered();
 	[Signal] public delegate void area_exited();
+
+
+	// Enum
+	enum PlatformState 
+	{
+		Wait,
+		Break,
+		Fall,
+		Respawn
+	}
+
+	PlatformState state = PlatformState.Wait;
 
 	// Called when the node enters the scene tree for the first time. Connects
 	// the signal of a collision onto this hitbox to the player so that it can
@@ -66,34 +77,70 @@ public class BreakablePlatformEffect : Area2D
 	// 
 	public override void _PhysicsProcess(float delta)
 	{
-		// Block is breaking
-		if (isBreaking) 
+		// transitions
+		switch (state)
 		{
-			bTimer--;
-			animatedSprite.Position = new Vector2(spritePos.x + (int) GD.RandRange(-1.5, 1.5),spritePos.y + (int) GD.RandRange(-1.5, 1.5));
-			animatedSprite.Play("Breaking");
+			case PlatformState.Wait:
+				if (isBreaking)
+				{
+					state = PlatformState.Break;
+					isOn = false;
+				}
+				break;
+
+			case PlatformState.Break:
+				bTimer--;
+				if (bTimer <= 0 && sTimer > 0)
+				{
+					state = PlatformState.Fall;
+					isBreaking = false;
+					isRespawning = true;
+					collision.Disabled = true;
+				}
+				break;
+
+			case PlatformState.Fall:
+				sTimer--;
+				if (sTimer <= 0 && !inArea)
+				{
+					state = PlatformState.Respawn;
+					sTimer = SDELAY;
+					bTimer = BDELAY;
+					collision.Disabled = false;
+					isRespawning = false;
+				}
+				break;
+
+			case PlatformState.Respawn:
+				if (isOn)
+				{
+					state = PlatformState.Wait;
+				}
+				break;
+
 		}
 
-		// Block is Falling and Broken. Block goes into respawning state.
-		if (bTimer <= 0 && sTimer > 0)
+		// animations
+		switch (state)
 		{
-			sTimer--;
-			isBreaking = false;
-			isRespawning = true;
-			collision.Disabled = true;
-			animatedSprite.Position = spritePos;
-			animatedSprite.Play("Broken");
-		}
+			case PlatformState.Wait:
+				animatedSprite.Play("Idle");
+				break;
 
-		// Block is respawning, reset values. Returns to Idle state after 
-		// animation finishes
-		if (sTimer <= 0 && !inArea)
-		{
-			collision.Disabled = false;
-			sTimer = SDELAY;
-			bTimer = BDELAY;
-			isRespawning = false;
-			animatedSprite.Play("Respawning");
+			case PlatformState.Break:
+				animatedSprite.Position = new Vector2(spritePos.x + (int) GD.RandRange(-1.5, 1.5),spritePos.y + (int) GD.RandRange(-1.5, 1.5));
+				animatedSprite.Play("Breaking");
+				break;
+
+			case PlatformState.Fall:
+				animatedSprite.Position = spritePos;
+				animatedSprite.Play("Broken");
+				break;
+
+			case PlatformState.Respawn:
+				animatedSprite.Play("Respawning");
+				break;
+
 		}
 
 		currentAnimation = animatedSprite.Animation;
@@ -116,6 +163,7 @@ public class BreakablePlatformEffect : Area2D
 		inArea = false;
 	}
 	
+	// Plays when animation is finished
 	private void OnAnimationFinished()
 	{
 		if (currentAnimation == "Broken")
@@ -125,6 +173,7 @@ public class BreakablePlatformEffect : Area2D
 		else if (currentAnimation == "Respawning")
 		{
 			animatedSprite.Play("Idle");
+			isOn = true;
 		}
 		
 	}

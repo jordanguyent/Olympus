@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://Boxes/Effectbox.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/Level1/Assets/BreakablePlatformEffect.cs" type="Script" id=2]
@@ -24,41 +24,65 @@ region = Rect2( 192, 0, 48, 16 )
 atlas = ExtResource( 3 )
 region = Rect2( 240, 0, 48, 16 )
 
-[sub_resource type="AtlasTexture" id=6]
-atlas = ExtResource( 3 )
-region = Rect2( 288, 0, 48, 16 )
-
-[sub_resource type="AtlasTexture" id=7]
-atlas = ExtResource( 3 )
-region = Rect2( 336, 0, 48, 16 )
-
-[sub_resource type="AtlasTexture" id=8]
-atlas = ExtResource( 3 )
-region = Rect2( 384, 0, 48, 16 )
-
-[sub_resource type="AtlasTexture" id=9]
-atlas = ExtResource( 3 )
-region = Rect2( 432, 0, 48, 16 )
-
-[sub_resource type="AtlasTexture" id=10]
-atlas = ExtResource( 3 )
-region = Rect2( 480, 0, 48, 16 )
-
-[sub_resource type="AtlasTexture" id=11]
-atlas = ExtResource( 3 )
-region = Rect2( 528, 0, 48, 16 )
-
-[sub_resource type="AtlasTexture" id=12]
-atlas = ExtResource( 3 )
-region = Rect2( 576, 0, 48, 16 )
-
-[sub_resource type="AtlasTexture" id=13]
+[sub_resource type="AtlasTexture" id=25]
 atlas = ExtResource( 3 )
 region = Rect2( 624, 0, 48, 16 )
 
-[sub_resource type="AtlasTexture" id=14]
+[sub_resource type="AtlasTexture" id=26]
+atlas = ExtResource( 3 )
+region = Rect2( 672, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=27]
+atlas = ExtResource( 3 )
+region = Rect2( 720, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=28]
+atlas = ExtResource( 3 )
+region = Rect2( 768, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=29]
+atlas = ExtResource( 3 )
+region = Rect2( 816, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=30]
+atlas = ExtResource( 3 )
+region = Rect2( 864, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=31]
+atlas = ExtResource( 3 )
+region = Rect2( 912, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=9]
 atlas = ExtResource( 3 )
 region = Rect2( 0, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=18]
+atlas = ExtResource( 3 )
+region = Rect2( 288, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=19]
+atlas = ExtResource( 3 )
+region = Rect2( 336, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=20]
+atlas = ExtResource( 3 )
+region = Rect2( 384, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=21]
+atlas = ExtResource( 3 )
+region = Rect2( 432, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=22]
+atlas = ExtResource( 3 )
+region = Rect2( 480, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=23]
+atlas = ExtResource( 3 )
+region = Rect2( 528, 0, 48, 16 )
+
+[sub_resource type="AtlasTexture" id=24]
+atlas = ExtResource( 3 )
+region = Rect2( 576, 0, 48, 16 )
 
 [sub_resource type="SpriteFrames" id=15]
 animations = [ {
@@ -67,20 +91,20 @@ animations = [ {
 "name": "Breaking",
 "speed": 10.0
 }, {
-"frames": [ SubResource( 6 ), SubResource( 7 ), SubResource( 8 ), SubResource( 9 ), SubResource( 10 ) ],
-"loop": false,
-"name": "Broken",
-"speed": 20.0
-}, {
-"frames": [ SubResource( 11 ), SubResource( 12 ), SubResource( 13 ) ],
+"frames": [ SubResource( 25 ), SubResource( 26 ), SubResource( 27 ), SubResource( 28 ), SubResource( 29 ), SubResource( 30 ), SubResource( 31 ) ],
 "loop": false,
 "name": "Respawning",
-"speed": 20.0
+"speed": 30.0
 }, {
-"frames": [ SubResource( 14 ) ],
+"frames": [ SubResource( 9 ) ],
 "loop": false,
 "name": "Idle",
 "speed": 20.0
+}, {
+"frames": [ SubResource( 18 ), SubResource( 19 ), SubResource( 20 ), SubResource( 21 ), SubResource( 22 ), SubResource( 23 ), SubResource( 24 ) ],
+"loop": false,
+"name": "Broken",
+"speed": 30.0
 } ]
 
 [sub_resource type="RectangleShape2D" id=16]
