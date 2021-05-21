@@ -77,6 +77,7 @@ public class Pause : CanvasLayer
     {
         if(this.On){
             if(Input.IsActionJustPressed("ui_cancel")){
+                OptionNumber = 0;
                 PauseLayer.Visible = !PauseLayer.Visible;
                 GetTree().Paused = !GetTree().Paused;
             }

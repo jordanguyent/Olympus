@@ -49,59 +49,34 @@ margin_left = 13.0
 margin_right = 96.0
 margin_bottom = 72.0
 
-[node name="New Game" type="CenterContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer"]
+[node name="Play" type="CenterContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer"]
 margin_right = 83.0
 margin_bottom = 15.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/New Game"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Play"]
 margin_right = 83.0
 margin_bottom = 15.0
 
-[node name=">" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/New Game/HBoxContainer"]
+[node name=">" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Play/HBoxContainer"]
 margin_right = 7.0
 margin_bottom = 15.0
 rect_min_size = Vector2( 7, 0 )
 custom_fonts/font = ExtResource( 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 
-[node name="NewGame" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/New Game/HBoxContainer"]
+[node name="Play" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Play/HBoxContainer"]
 margin_left = 11.0
 margin_right = 83.0
 margin_bottom = 15.0
 rect_min_size = Vector2( 72, 0 )
 custom_fonts/font = ExtResource( 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-text = "New Game"
+text = "Play"
 
-[node name="Load Game" type="CenterContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer"]
+[node name="Options" type="CenterContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer"]
 margin_top = 19.0
 margin_right = 83.0
 margin_bottom = 34.0
-
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Load Game"]
-margin_right = 83.0
-margin_bottom = 15.0
-
-[node name=">" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Load Game/HBoxContainer"]
-margin_right = 7.0
-margin_bottom = 15.0
-rect_min_size = Vector2( 7, 0 )
-custom_fonts/font = ExtResource( 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-
-[node name="LoadGame" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Load Game/HBoxContainer"]
-margin_left = 11.0
-margin_right = 83.0
-margin_bottom = 15.0
-rect_min_size = Vector2( 72, 0 )
-custom_fonts/font = ExtResource( 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-text = "Load Game"
-
-[node name="Options" type="CenterContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer"]
-margin_top = 38.0
-margin_right = 83.0
-margin_bottom = 53.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Options"]
 margin_right = 83.0
@@ -114,7 +89,7 @@ rect_min_size = Vector2( 7, 0 )
 custom_fonts/font = ExtResource( 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 
-[node name="LoadGame" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Options/HBoxContainer"]
+[node name="Options" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Options/HBoxContainer"]
 margin_left = 11.0
 margin_right = 83.0
 margin_bottom = 15.0
@@ -122,6 +97,31 @@ rect_min_size = Vector2( 72, 0 )
 custom_fonts/font = ExtResource( 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 text = "Options"
+
+[node name="Keybinds" type="CenterContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer"]
+margin_top = 38.0
+margin_right = 83.0
+margin_bottom = 53.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Keybinds"]
+margin_right = 83.0
+margin_bottom = 15.0
+
+[node name=">" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Keybinds/HBoxContainer"]
+margin_right = 7.0
+margin_bottom = 15.0
+rect_min_size = Vector2( 7, 0 )
+custom_fonts/font = ExtResource( 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+
+[node name="Keybinds" type="Label" parent="CenterContainer/VBoxContainer/Select/VBoxContainer/Keybinds/HBoxContainer"]
+margin_left = 11.0
+margin_right = 83.0
+margin_bottom = 15.0
+rect_min_size = Vector2( 72, 0 )
+custom_fonts/font = ExtResource( 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "Keybinds"
 
 [node name="Exit" type="CenterContainer" parent="CenterContainer/VBoxContainer/Select/VBoxContainer"]
 margin_top = 57.0

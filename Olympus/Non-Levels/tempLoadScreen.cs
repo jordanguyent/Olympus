@@ -52,7 +52,7 @@ public class tempLoadScreen : MarginContainer
 	public override void _Ready()
 	{
 		//Getting the autoload scene handler and connecting signals
-		SceneHandler SCNHAND = (SceneHandler)GetNode("/root/SceneHandler");
+		SceneHandler SCNHAND = GetNode("/root/SceneHandler") as SceneHandler;
 		if(SCNHAND == null){
 			throw new ArgumentNullException("Edwin: Autoload SceneHandler not found"); 
 		}

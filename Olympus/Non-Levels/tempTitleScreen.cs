@@ -5,17 +5,17 @@ using System.Collections.Generic;
 public class tempTitleScreen : MarginContainer
 {
 	[Signal]
-	public delegate void OpenNewGame();
+	public delegate void MoveToPlayGame();
 	[Signal]
-	public delegate void OpenLoadGame();
+	public delegate void MoveToGameOptions();
 	[Signal]
-	public delegate void OpenGameOptions();
+	public delegate void MoveToKeybinds();
 
 	//Paths to the labels we modify
 	private List<string> LabelPaths = new List<string>{
-		{"CenterContainer/VBoxContainer/Select/VBoxContainer/New Game/HBoxContainer/>"}, //New Game
-		{"CenterContainer/VBoxContainer/Select/VBoxContainer/Load Game/HBoxContainer/>"}, //Load Game
+		{"CenterContainer/VBoxContainer/Select/VBoxContainer/Play/HBoxContainer/>"}, //Play Game
 		{"CenterContainer/VBoxContainer/Select/VBoxContainer/Options/HBoxContainer/>"}, //Options
+		{"CenterContainer/VBoxContainer/Select/VBoxContainer/Keybinds/HBoxContainer/>"}, //Keybinds
 		{"CenterContainer/VBoxContainer/Select/VBoxContainer/Exit/HBoxContainer/>"} //Exit
 	};
 
@@ -47,9 +47,9 @@ public class tempTitleScreen : MarginContainer
 		if(SCNHAND == null){
 			throw new ArgumentNullException("Edwin: Autoload SceneHandler not found"); 
 		}
-		Connect("OpenNewGame", SCNHAND, "MoveToNewGameMenu");
-		Connect("OpenLoadGame", SCNHAND, "MoveToLoadGameMenu");
-		Connect("OpenGameOptions", SCNHAND, "MoveToOptionMenu");
+		Connect("MoveToPlayGame", SCNHAND, "MoveToPlayGame");
+		Connect("MoveToGameOptions", SCNHAND, "MoveToGameOptions");
+		Connect("MoveToKeybinds", SCNHAND, "MoveToKeybinds");
 
 		//Setting up the selector for the menu
 		MaxOptionLength = LabelPaths.Count;
@@ -72,13 +72,13 @@ public class tempTitleScreen : MarginContainer
 		if(Input.IsActionJustPressed("ui_accept")){
 			switch(OptionNumber){
 				case 0:
-					NewGame();
+					PlayGame();
 					break;
 				case 1:
-					LoadGame();
+					Options();
 					break;
 				case 2:
-					Options();
+					Keybinds();
 					break;
 				case 3:
 					Exit();
@@ -89,16 +89,16 @@ public class tempTitleScreen : MarginContainer
 		}
 	}
 
-	private void NewGame(){
-		EmitSignal("OpenNewGame");
-	}
-
-	private void LoadGame(){
-		EmitSignal("OpenLoadGame");
+	private void PlayGame(){
+		EmitSignal("MoveToPlayGame");
 	}
 
 	private void Options(){
-		EmitSignal("OpenGameOptions");
+		EmitSignal("MoveToGameOptions");
+	}
+
+	private void Keybinds(){
+
 	}
 
 	private void Exit(){

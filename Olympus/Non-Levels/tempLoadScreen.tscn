@@ -22,17 +22,17 @@ margin_right = 400.0
 margin_bottom = 225.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-margin_left = 168.0
+margin_left = 115.0
 margin_top = 86.0
-margin_right = 232.0
+margin_right = 284.0
 margin_bottom = 139.0
 
 [node name="Save 1 Parent" type="CenterContainer" parent="CenterContainer/VBoxContainer"]
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 15.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Save 1 Parent"]
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 15.0
 
 [node name=">" type="Label" parent="CenterContainer/VBoxContainer/Save 1 Parent/HBoxContainer"]
@@ -45,19 +45,19 @@ custom_constants/shadow_as_outline = 0
 
 [node name="Save 1" type="Label" parent="CenterContainer/VBoxContainer/Save 1 Parent/HBoxContainer"]
 margin_left = 19.0
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 15.0
-rect_min_size = Vector2( 45, 0 )
+rect_min_size = Vector2( 150, 0 )
 custom_fonts/font = ExtResource( 2 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 
 [node name="Save 2 Parent" type="CenterContainer" parent="CenterContainer/VBoxContainer"]
 margin_top = 19.0
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 34.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Save 2 Parent"]
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 15.0
 
 [node name=">" type="Label" parent="CenterContainer/VBoxContainer/Save 2 Parent/HBoxContainer"]
@@ -70,19 +70,19 @@ custom_constants/shadow_as_outline = 0
 
 [node name="Save 2" type="Label" parent="CenterContainer/VBoxContainer/Save 2 Parent/HBoxContainer"]
 margin_left = 19.0
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 15.0
-rect_min_size = Vector2( 45, 0 )
+rect_min_size = Vector2( 150, 0 )
 custom_fonts/font = ExtResource( 2 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 
 [node name="Save 3 Parent" type="CenterContainer" parent="CenterContainer/VBoxContainer"]
 margin_top = 38.0
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 53.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Save 3 Parent"]
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 15.0
 
 [node name=">" type="Label" parent="CenterContainer/VBoxContainer/Save 3 Parent/HBoxContainer"]
@@ -95,8 +95,8 @@ custom_constants/shadow_as_outline = 0
 
 [node name="Save 3" type="Label" parent="CenterContainer/VBoxContainer/Save 3 Parent/HBoxContainer"]
 margin_left = 19.0
-margin_right = 64.0
+margin_right = 169.0
 margin_bottom = 15.0
-rect_min_size = Vector2( 45, 0 )
+rect_min_size = Vector2( 150, 0 )
 custom_fonts/font = ExtResource( 2 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )

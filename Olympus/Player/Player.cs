@@ -172,7 +172,7 @@ public class Player : KinematicBody2D
 		if (SHPos == null)
 		{
 			// don't do anything just spawn regularly
-			GD.Print("NULL");
+			// GD.Print("NULL");
 		}
 		else
 		{

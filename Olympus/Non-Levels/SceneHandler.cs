@@ -7,6 +7,9 @@ public class SceneHandler : Node
 	[Signal]
 	public delegate void SetPlayerSpawn(Godot.Collections.Array StagePos);
 
+	//Password for file encryption
+	public const string Password = "yeaaa yeaaa";
+
 	Godot.Collections.Dictionary<string, string> stageList;
 	public Node CurrentScene{get; set;}
 	private string CurrentPath;
@@ -91,10 +94,10 @@ public class SceneHandler : Node
 		}
 	}
 
-	public void StartGame(int SaveFileNum, string Password){
+	public void StartGame(int SaveFileNum){
 		Godot.File SaveFile = new Godot.File();
 		this.SavePath = $"user://save{SaveFileNum}.json";
-		// SaveFile.OpenEncryptedWithPass(this.SavePath, Godot.File.ModeFlags.Read, Password);
+		// SaveFile.OpenEncryptedWithPass(this.SavePath, Godot.File.ModeFlags.Read, this.Password);
 		SaveFile.Open(this.SavePath, Godot.File.ModeFlags.Read);
 		var SaveData = new Godot.Collections.Dictionary<string, object>( (Godot.Collections.Dictionary)JSON.Parse(SaveFile.GetLine()).Result );
 		Godot.Collections.Array StageData = (Godot.Collections.Array)SaveData["WorldData"];
@@ -114,18 +117,18 @@ public class SceneHandler : Node
 		SaveFile.Close();
 	}
 
-	public void MoveToNewGameMenu(){
-		string NewGameMenu = $"res://Non-Levels/tempSaveScreen.tscn";
-		SceneHelper(NewGameMenu);
+	public void MoveToPlayGame(){
+		string PlayScreenMenu = $"res://Non-Levels/tempPlayScreen.tscn";
+		SceneHelper(PlayScreenMenu);
 	}
 
-	public void MoveToLoadGameMenu(){
-		string LoadGameMenu = $"res://Non-Levels/tempLoadScreen.tscn";
-		SceneHelper(LoadGameMenu);
+	public void MoveToKeybinds(){
+		
 	}
 
-	public void MoveToOptionMenu(){
-		//This is a stub - Make option screen later
+	public void MoveToGameOptions(){
+		string LoadOptionMenu = $"res://Non-Levels/tempOptionScreen.tscn";
+		SceneHelper(LoadOptionMenu);
 	}
 
 	public void ReturnToMainMenu(){
