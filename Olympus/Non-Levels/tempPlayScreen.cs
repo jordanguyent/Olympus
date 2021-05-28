@@ -9,9 +9,9 @@ public class tempPlayScreen : MarginContainer
 	public delegate void StartGame(int SaveFileNum);
 	[Signal]
 	public delegate void CreateGameAndStart(int SaveFileNum, string Password);
-    [Signal]
-    public delegate void DeleteGame(int SaveFileNum, string Password);    
-    [Signal]
+	[Signal]
+	public delegate void DeleteGame(int SaveFileNum, string Password);    
+	[Signal]
 	public delegate void ReturnToMainMenu();
 	[Signal]
 	public delegate void RaisePrompt(int SaveFileNum);
@@ -52,8 +52,8 @@ public class tempPlayScreen : MarginContainer
 
 	//Paths to the text the arrows point to
 
-    //Labels we modify to change text
-    private List<Label> LeftArrows = new List<Label>();
+	//Labels we modify to change text
+	private List<Label> LeftArrows = new List<Label>();
 	private List<Label> SaveFileDescs = new List<Label>();
 	private List<Label> RightArrows = new List<Label>();
 	private List<Label> DeleteOptions = new List<Label>();
@@ -76,8 +76,8 @@ public class tempPlayScreen : MarginContainer
 		}
 	}
 
-    public override void _Ready()
-    {
+	public override void _Ready()
+	{
 		//Getting the autoload SceneHandler and connecting signals
 		SceneHandler SCNHAND = (SceneHandler)GetNode("/root/SceneHandler");
 		if(SCNHAND == null){
@@ -90,7 +90,7 @@ public class tempPlayScreen : MarginContainer
 		Connect("StartGame", SCNHAND, "StartGame");
 		Connect("ReturnToMainMenu", SCNHAND, "ReturnToMainMenu");
 		Connect("RaisePrompt", DELETEDIALOGUE, "RaisePrompt");
-        
+		
 		//Getting the labels/save files from the label/save file paths from within the scene
 		MaxOptionLength = LeftArrowPaths.Count;
 		OptionNumber = 0;
@@ -132,7 +132,7 @@ public class tempPlayScreen : MarginContainer
 				DeleteOptions[i].Text = $"Delete Save";
 			}
 		}
-    }
+	}
 
 	public override void _Process(float delta)
 	{

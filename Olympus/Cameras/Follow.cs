@@ -159,14 +159,6 @@ public class Follow : Camera2D
 	{
 		destinationPosition = targetPosition;
 		Vector2 distance = new Vector2(destinationPosition.x - currentPosition.x, destinationPosition.y - currentPosition.y);
-		if (Math.Abs(distance.x) < .3)
-		{
-			distance.x = 0; 
-		}
-		if (Math.Abs(distance.y) < .3)
-		{
-			distance.y = 0;
-		}
 		currentPosition += distance / smoothingDuration * delta;
 		Position = currentPosition.Snapped(Vector2.One);
 
