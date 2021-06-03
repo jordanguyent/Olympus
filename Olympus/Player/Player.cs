@@ -54,8 +54,7 @@ public class Player : KinematicBody2D
 	// Signals
 	[Signal] public delegate void PlayerDeath();
 
-	[Signal]
-	public delegate void TransitionPlayer(String transitionAnimation);
+	[Signal] public delegate void TransitionPlayer(String transitionAnimation);
 
 	// World Movement Constants
 	[Export] int MAXSPEEDX = 100;
