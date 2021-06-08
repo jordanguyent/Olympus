@@ -40,11 +40,10 @@ texture = ExtResource( 6 )
 [node name="TMBackground" parent="." instance=ExtResource( 5 )]
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
-position = Vector2( 128, 304 )
+position = Vector2( 104, 304 )
 
 [node name="Bird" parent="." instance=ExtResource( 14 )]
 position = Vector2( -96, 360 )
-collision_layer = 0
 
 [node name="Whistle" parent="." instance=ExtResource( 15 )]
 position = Vector2( -104, 320 )

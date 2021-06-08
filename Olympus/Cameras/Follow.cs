@@ -200,9 +200,9 @@ public class Follow : Camera2D
 			x = Position.x;
 		}
 
-		if (Position.y - cameraPaddingY - 1 < y1)
+		if (Position.y - cameraPaddingY < y1)
 		{
-			y = y1 + cameraPaddingY + 1;
+			y = y1 + cameraPaddingY;
 		}
 		else if (Position.y + cameraPaddingY > y2)
 		{

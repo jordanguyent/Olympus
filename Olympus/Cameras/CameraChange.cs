@@ -16,7 +16,7 @@ public class CameraChange : Area2D
 	[Export] Vector2 scale = Vector2.One;
 	[Export] float smoothingDuration = 0.1f;
 	[Export] Vector2 topLeftPosLim = Vector2.Zero;
-	[Export] Vector2 botRightPosLim = new Vector2(400, 225);
+	[Export] Vector2 botRightPosLim = new Vector2(480, 270);
 
 	private Player player = null;
 	private Camera2D playerCam = null;
