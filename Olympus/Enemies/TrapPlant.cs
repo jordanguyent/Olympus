@@ -25,7 +25,6 @@ public class TrapPlant : StaticBody2D
 
 	// Nodes
 	private Player player = null;
-	private Bird bird = null;
 	private AnimatedSprite plantAnimation = null;
 	private Area2D triggerBox = null;
 	private Area2D collisionBox = null;
@@ -44,7 +43,6 @@ public class TrapPlant : StaticBody2D
 	{
 		// Obtain nodes
 		player = GetNode<Player>("../Player");
-		bird = GetNode<Bird>("../Bird");
 		plantAnimation = GetNode<AnimatedSprite>("AnimatedSprite");
 		triggerBox = GetNode<Area2D>("TriggerBox");
 		collisionBox = GetNode<Area2D>("CollisionBox");
@@ -52,8 +50,6 @@ public class TrapPlant : StaticBody2D
 		// Error Checking
 		if (player == null)
 			throw new ArgumentNullException("TrapPlant.cs: Player not found!"); 
-		if (bird == null)
-			throw new ArgumentNullException("TrapPlant.cs: Bird not found!"); 
 
 		// Connecting Signals
 		triggerBox.Connect("area_entered", this, "OnTriggerBoxEntered");
